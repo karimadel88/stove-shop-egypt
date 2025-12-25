@@ -1,29 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { shopApi } from "@/lib/api";
+import { ShopProduct } from "@/types/shop";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Filter, X, SlidersHorizontal } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Filter, X, SlidersHorizontal, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState<ShopProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  const brands = [...new Set(products.map((p) => p.brand))];
-  const maxPrice = Math.max(...products.map((p) => p.price));
-  const minPrice = Math.min(...products.map((p) => p.price));
+  // Extract unique brands and calculate price range from fetched products
+  // These should be calculated from products but NOT fed back into the fetch params automatically
+  const brands = [...new Set(products.map((p) => p.name.split(' ')[0]))]; 
+  const availableMaxPrice = products.length > 0 ? Math.max(...products.map((p) => p.price)) : 20000;
+  const availableMinPrice = products.length > 0 ? Math.min(...products.map((p) => p.price)) : 0;
 
   const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+  
+  // URL Params for filtering
+  const paramMinPrice = searchParams.get("minPrice");
+  const paramMaxPrice = searchParams.get("maxPrice");
+  const categoryId = searchParams.get("categoryId") || undefined;
+  const search = searchParams.get("search") || undefined;
+
+  // Visual Slider State
   const priceRange = [
-    Number(searchParams.get("minPrice")) || minPrice,
-    Number(searchParams.get("maxPrice")) || maxPrice,
+    paramMinPrice ? Number(paramMinPrice) : availableMinPrice,
+    paramMaxPrice ? Number(paramMaxPrice) : availableMaxPrice,
   ];
-  const inStockOnly = searchParams.get("inStock") === "true";
+
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await shopApi.listProducts({
+          categoryId,
+          search,
+          // Only send price params if they exist in URL
+          minPrice: paramMinPrice ? Number(paramMinPrice) : undefined,
+          maxPrice: paramMaxPrice ? Number(paramMaxPrice) : undefined,
+        });
+        setProducts(response.data?.data || response.data || []);
+      } catch (err: any) {
+        const errorMsg = err.response?.data?.message || 'فشل في تحميل المنتجات';
+        setError(errorMsg);
+        toast.error(errorMsg);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [categoryId, search, paramMinPrice, paramMaxPrice]);
 
   const updateFilters = (key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams);
@@ -51,21 +92,17 @@ const Products = () => {
     setSearchParams(new URLSearchParams());
   };
 
+  // Client-side filtering for brands (if needed)
   const filteredProducts = products.filter((product) => {
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-      return false;
-    }
-    if (product.price < priceRange[0] || product.price > priceRange[1]) {
-      return false;
-    }
-    if (inStockOnly && !product.inStock) {
-      return false;
+    if (selectedBrands.length > 0) {
+      const productBrand = product.name.split(' ')[0];
+      if (!selectedBrands.includes(productBrand)) return false;
     }
     return true;
   });
 
-  const hasActiveFilters = selectedBrands.length > 0 || inStockOnly || 
-    priceRange[0] !== minPrice || priceRange[1] !== maxPrice;
+  const hasActiveFilters = selectedBrands.length > 0 || categoryId || search ||
+    paramMinPrice || paramMaxPrice;
 
   const FilterPanel = () => (
     <div className="space-y-6">
@@ -82,27 +119,29 @@ const Products = () => {
         )}
       </div>
 
-      <div className="space-y-4">
-        <h4 className="font-semibold text-foreground">الماركة</h4>
-        <div className="space-y-3">
-          {brands.map((brand) => (
-            <div key={brand} className="flex items-center gap-3">
-              <Checkbox
-                id={brand}
-                checked={selectedBrands.includes(brand)}
-                onCheckedChange={() => toggleBrand(brand)}
-              />
-              <Label htmlFor={brand} className="cursor-pointer">{brand}</Label>
-            </div>
-          ))}
+      {brands.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="font-semibold text-foreground">الماركة</h4>
+          <div className="space-y-3">
+            {brands.map((brand) => (
+              <div key={brand} className="flex items-center gap-3">
+                <Checkbox
+                  id={brand}
+                  checked={selectedBrands.includes(brand)}
+                  onCheckedChange={() => toggleBrand(brand)}
+                />
+                <Label htmlFor={brand} className="cursor-pointer">{brand}</Label>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="space-y-4">
         <h4 className="font-semibold text-foreground">السعر</h4>
         <Slider
-          min={minPrice}
-          max={maxPrice}
+          min={availableMinPrice}
+          max={availableMaxPrice}
           step={100}
           value={priceRange}
           onValueChange={handlePriceChange}
@@ -111,18 +150,6 @@ const Products = () => {
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>{priceRange[0].toLocaleString()} ج.م</span>
           <span>{priceRange[1].toLocaleString()} ج.م</span>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h4 className="font-semibold text-foreground">التوفر</h4>
-        <div className="flex items-center gap-3">
-          <Checkbox
-            id="inStock"
-            checked={inStockOnly}
-            onCheckedChange={(checked) => updateFilters("inStock", checked ? "true" : null)}
-          />
-          <Label htmlFor="inStock" className="cursor-pointer">متوفر فقط</Label>
         </div>
       </div>
     </div>
@@ -137,7 +164,7 @@ const Products = () => {
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">جميع المنتجات</h1>
               <p className="text-muted-foreground">
-                {filteredProducts.length} منتج
+                {isLoading ? "جاري التحميل..." : `${filteredProducts.length} منتج`}
                 {hasActiveFilters && " (بعد الفلترة)"}
               </p>
             </div>
@@ -183,7 +210,25 @@ const Products = () => {
 
             {/* Products Grid */}
             <div className="lg:col-span-3">
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="space-y-4">
+                      <Skeleton className="aspect-square w-full rounded-xl" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="text-center py-16">
+                  <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+                  <p className="text-muted-foreground text-lg mb-4">{error}</p>
+                  <Button variant="outline" onClick={() => window.location.reload()}>
+                    إعادة المحاولة
+                  </Button>
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-muted-foreground text-lg mb-4">
                     لا توجد منتجات تطابق معايير البحث
@@ -196,7 +241,7 @@ const Products = () => {
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredProducts.map((product, index) => (
                     <div
-                      key={product.id}
+                      key={product._id}
                       className="animate-fade-up"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >

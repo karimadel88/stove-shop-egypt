@@ -15,8 +15,10 @@ import {
   MessageCircle,
   CheckCircle
 } from "lucide-react";
+import { useSettings } from "@/context/SettingsContext";
 
 const Contact = () => {
+  const { settings } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,12 +43,17 @@ const Contact = () => {
 
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success("تم إرسال رسالتك بنجاح!");
+    try {
+      const { shopApi } = await import("@/lib/api");
+      await shopApi.submitContactForm(formData);
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      toast.success("تم إرسال رسالتك بنجاح!");
+    } catch (error: any) {
+      setIsSubmitting(false);
+      toast.error(error.response?.data?.message || "فشل في إرسال الرسالة");
+    }
   };
 
   if (isSubmitted) {
@@ -96,19 +103,19 @@ const Contact = () => {
                     { 
                       icon: Phone, 
                       title: "الهاتف", 
-                      value: "+20 123 456 7890",
+                      value: settings?.contactInfo?.phone || "+20 123 456 7890",
                       dir: "ltr" 
                     },
                     { 
                       icon: Mail, 
                       title: "البريد الإلكتروني", 
-                      value: "info@egygas.com",
+                      value: settings?.contactInfo?.email || "info@egygas.com",
                       dir: "ltr" 
                     },
                     { 
                       icon: MapPin, 
                       title: "العنوان", 
-                      value: "القاهرة، مصر - شارع التحرير",
+                      value: settings?.contactInfo?.address || "القاهرة، مصر - شارع التحرير",
                       dir: "rtl" 
                     },
                     { 
@@ -135,6 +142,8 @@ const Contact = () => {
                   ))}
                 </div>
               </div>
+
+              {/* WhatsApp */}
 
               {/* WhatsApp */}
               <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6">

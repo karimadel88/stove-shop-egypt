@@ -46,11 +46,26 @@ const Cart = () => {
                   key={item.id}
                   className="bg-card rounded-xl p-4 shadow-soft flex gap-4"
                 >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-24 h-24 object-cover rounded-lg bg-muted"
-                  />
+                  <div className="w-24 h-24 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                          const icon = document.createElement('div');
+                          icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package text-muted-foreground"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22v-10"/></svg>';
+                          e.currentTarget.parentElement?.appendChild(icon);
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-foreground mb-1">{item.name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{item.brand}</p>
@@ -111,7 +126,7 @@ const Cart = () => {
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>الشحن</span>
-                    <span className="text-green-600 font-medium">مجاني</span>
+                    <span className="text-muted-foreground text-sm">يُحسب عند الدفع</span>
                   </div>
                   <div className="border-t border-border pt-3">
                     <div className="flex justify-between text-lg font-bold text-foreground">
