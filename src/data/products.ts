@@ -1,0 +1,71 @@
+import { Product } from "@/types/product";
+import stove1 from "@/assets/stove-1.jpg";
+import stove2 from "@/assets/stove-2.jpg";
+import stove3 from "@/assets/stove-3.jpg";
+
+export const products: Product[] = [
+  {
+    id: "1",
+    name: "بوتجاز فريش 5 شعلة ستانلس ستيل",
+    description: "بوتجاز فريش عالي الجودة مع 5 شعلات وفرن واسع وشواية",
+    price: 8500,
+    originalPrice: 9500,
+    image: stove1,
+    brand: "فريش",
+    features: ["5 شعلات", "فرن مزدوج", "شواية", "إشعال ذاتي"],
+    inStock: true,
+  },
+  {
+    id: "2",
+    name: "بوتجاز يونيفرسال 4 شعلة",
+    description: "بوتجاز يونيفرسال اقتصادي مع 4 شعلات وفرن كبير",
+    price: 6200,
+    originalPrice: 7000,
+    image: stove2,
+    brand: "يونيفرسال",
+    features: ["4 شعلات", "فرن كبير", "إشعال ذاتي", "ضمان سنتين"],
+    inStock: true,
+  },
+  {
+    id: "3",
+    name: "بوتجاز كريازي 5 شعلة بالفرن",
+    description: "بوتجاز كريازي مصري الصنع بجودة عالية وتصميم أنيق",
+    price: 7800,
+    image: stove1,
+    brand: "كريازي",
+    features: ["5 شعلات", "فرن مزدوج", "موفر للطاقة", "صناعة مصرية"],
+    inStock: true,
+  },
+  {
+    id: "4",
+    name: "بوتجاز جليم جاز إيطالي",
+    description: "بوتجاز إيطالي فاخر مع تقنيات حديثة وتصميم راقي",
+    price: 12500,
+    originalPrice: 14000,
+    image: stove3,
+    brand: "جليم جاز",
+    features: ["5 شعلات", "فرن تربو", "شاشة ديجيتال", "صناعة إيطالية"],
+    inStock: true,
+  },
+  {
+    id: "5",
+    name: "بوتجاز تكنوجاز 4 شعلة",
+    description: "بوتجاز تكنوجاز عملي واقتصادي للمطابخ الصغيرة",
+    price: 5500,
+    image: stove2,
+    brand: "تكنوجاز",
+    features: ["4 شعلات", "فرن متوسط", "إشعال ذاتي", "سهل التنظيف"],
+    inStock: false,
+  },
+  {
+    id: "6",
+    name: "بوتجاز لاجيرمانيا 5 شعلة",
+    description: "بوتجاز لاجيرمانيا الإيطالي الفاخر مع أحدث التقنيات",
+    price: 15000,
+    originalPrice: 17000,
+    image: stove3,
+    brand: "لاجيرمانيا",
+    features: ["5 شعلات قوية", "فرن كهربائي", "مروحة تبريد", "ضمان 5 سنوات"],
+    inStock: true,
+  },
+];
