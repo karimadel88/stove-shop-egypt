@@ -1,4 +1,5 @@
 import { Flame, Phone, Mail, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -20,10 +21,10 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4">روابط سريعة</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-secondary-foreground/70 hover:text-primary transition-colors">الرئيسية</a></li>
-              <li><a href="#products" className="text-secondary-foreground/70 hover:text-primary transition-colors">المنتجات</a></li>
-              <li><a href="#" className="text-secondary-foreground/70 hover:text-primary transition-colors">العروض</a></li>
-              <li><a href="#" className="text-secondary-foreground/70 hover:text-primary transition-colors">سياسة الإرجاع</a></li>
+              <li><Link to="/" className="text-secondary-foreground/70 hover:text-primary transition-colors">الرئيسية</Link></li>
+              <li><Link to="/products" className="text-secondary-foreground/70 hover:text-primary transition-colors">المنتجات</Link></li>
+              <li><Link to="/offers" className="text-secondary-foreground/70 hover:text-primary transition-colors">العروض</Link></li>
+              <li><Link to="/contact" className="text-secondary-foreground/70 hover:text-primary transition-colors">اتصل بنا</Link></li>
             </ul>
           </div>
 

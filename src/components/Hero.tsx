@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Truck, Shield, Headphones } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -18,29 +19,33 @@ const Hero = () => {
             تشكيلة واسعة من أفضل الماركات العالمية والمحلية مع ضمان وخدمة ما بعد البيع
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="gold" size="lg" className="group">
-              تسوق الآن
-              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="lg">
-              تصفح العروض
-            </Button>
+            <Link to="/products">
+              <Button variant="gold" size="lg" className="group w-full sm:w-auto">
+                تسوق الآن
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link to="/offers">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                تصفح العروض
+              </Button>
+            </Link>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
           {[
-            { icon: Truck, title: "توصيل مجاني", desc: "لجميع أنحاء مصر" },
-            { icon: Shield, title: "ضمان شامل", desc: "حتى 5 سنوات" },
-            { icon: Headphones, title: "دعم فني", desc: "24/7 متاح دائماً" },
+            { icon: "🚚", title: "توصيل مجاني", desc: "لجميع أنحاء مصر" },
+            { icon: "🛡️", title: "ضمان شامل", desc: "حتى 5 سنوات" },
+            { icon: "📞", title: "دعم فني", desc: "24/7 متاح دائماً" },
           ].map((item, index) => (
             <div
               key={index}
               className="flex items-center gap-4 bg-card p-6 rounded-xl shadow-soft hover:shadow-hover transition-all duration-300 group"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <item.icon className="w-7 h-7 text-primary" />
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
+                {item.icon}
               </div>
               <div>
                 <h3 className="font-bold text-foreground">{item.title}</h3>
