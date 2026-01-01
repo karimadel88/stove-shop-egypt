@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,8 +10,15 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Filter, X, SlidersHorizontal, AlertCircle } from "lucide-react";
+import { Filter, X, SlidersHorizontal, AlertCircle, ArrowUpDown, Grid3X3, LayoutGrid } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,11 +41,22 @@ const Products = () => {
   const categoryId = searchParams.get("categoryId") || undefined;
   const search = searchParams.get("search") || undefined;
 
-  // Visual Slider State
-  const priceRange = [
+  // Local slider state for smooth UI (debounced before updating URL)
+  const [localPriceRange, setLocalPriceRange] = useState<number[]>([
     paramMinPrice ? Number(paramMinPrice) : availableMinPrice,
     paramMaxPrice ? Number(paramMaxPrice) : availableMaxPrice,
-  ];
+  ]);
+  
+  // Debounce timer ref
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync local state when URL params or available range changes
+  useEffect(() => {
+    setLocalPriceRange([
+      paramMinPrice ? Number(paramMinPrice) : availableMinPrice,
+      paramMaxPrice ? Number(paramMaxPrice) : availableMaxPrice,
+    ]);
+  }, [paramMinPrice, paramMaxPrice, availableMinPrice, availableMaxPrice]);
 
   // Fetch products from backend
   useEffect(() => {
@@ -66,7 +84,7 @@ const Products = () => {
     fetchProducts();
   }, [categoryId, search, paramMinPrice, paramMaxPrice]);
 
-  const updateFilters = (key: string, value: string | null) => {
+  const updateFilters = useCallback((key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key, value);
@@ -74,7 +92,7 @@ const Products = () => {
       newParams.delete(key);
     }
     setSearchParams(newParams);
-  };
+  }, [searchParams, setSearchParams]);
 
   const toggleBrand = (brand: string) => {
     const newBrands = selectedBrands.includes(brand)
@@ -83,10 +101,23 @@ const Products = () => {
     updateFilters("brands", newBrands.length > 0 ? newBrands.join(",") : null);
   };
 
-  const handlePriceChange = (values: number[]) => {
-    updateFilters("minPrice", values[0].toString());
-    updateFilters("maxPrice", values[1].toString());
-  };
+  // Debounced price change handler
+  const handlePriceChange = useCallback((values: number[]) => {
+    setLocalPriceRange(values);
+    
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // Set new debounced update
+    debounceTimerRef.current = setTimeout(() => {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("minPrice", values[0].toString());
+      newParams.set("maxPrice", values[1].toString());
+      setSearchParams(newParams);
+    }, 400);
+  }, [searchParams, setSearchParams]);
 
   const clearFilters = () => {
     setSearchParams(new URLSearchParams());
@@ -103,6 +134,49 @@ const Products = () => {
 
   const hasActiveFilters = selectedBrands.length > 0 || categoryId || search ||
     paramMinPrice || paramMaxPrice;
+
+  // Sorting state
+  const sortBy = searchParams.get("sort") || "featured";
+  
+  const handleSortChange = (value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === "featured") {
+      newParams.delete("sort");
+    } else {
+      newParams.set("sort", value);
+    }
+    setSearchParams(newParams);
+  };
+
+  // Client-side sorting
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case "price_asc":
+        return a.price - b.price;
+      case "price_desc":
+        return b.price - a.price;
+      case "newest":
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      default:
+        return 0; // featured - keep original order
+    }
+  });
+
+  // Remove specific filter
+  const removeFilter = (key: string, value?: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (key === "brands" && value) {
+      const newBrands = selectedBrands.filter(b => b !== value);
+      if (newBrands.length > 0) {
+        newParams.set("brands", newBrands.join(","));
+      } else {
+        newParams.delete("brands");
+      }
+    } else {
+      newParams.delete(key);
+    }
+    setSearchParams(newParams);
+  };
 
   const FilterPanel = () => (
     <div className="space-y-6">
@@ -143,13 +217,13 @@ const Products = () => {
           min={availableMinPrice}
           max={availableMaxPrice}
           step={100}
-          value={priceRange}
+          value={localPriceRange}
           onValueChange={handlePriceChange}
           className="w-full"
         />
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{priceRange[0].toLocaleString()} ج.م</span>
-          <span>{priceRange[1].toLocaleString()} ج.م</span>
+          <span>{localPriceRange[0].toLocaleString()} ج.م</span>
+          <span>{localPriceRange[1].toLocaleString()} ج.م</span>
         </div>
       </div>
     </div>
@@ -160,22 +234,112 @@ const Products = () => {
       <Header />
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">جميع المنتجات</h1>
-              <p className="text-muted-foreground">
-                {isLoading ? "جاري التحميل..." : `${filteredProducts.length} منتج`}
-                {hasActiveFilters && " (بعد الفلترة)"}
-              </p>
+          {/* Header Section - Amazon/Noon Style */}
+          <div className="mb-6 space-y-4">
+            {/* Results Count & Sorting Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  {search ? `نتائج البحث: "${search}"` : "جميع المنتجات"}
+                </h1>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {isLoading ? (
+                    "جاري التحميل..."
+                  ) : (
+                    <>
+                      <span className="font-semibold text-foreground">{sortedProducts.length}</span> منتج
+                      {hasActiveFilters && " (بعد الفلترة)"}
+                    </>
+                  )}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                {/* Sorting Dropdown */}
+                <Select value={sortBy} onValueChange={handleSortChange}>
+                  <SelectTrigger className="w-[180px] bg-card">
+                    <ArrowUpDown className="w-4 h-4 ml-2" />
+                    <SelectValue placeholder="ترتيب حسب" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="featured">الأكثر رواجاً</SelectItem>
+                    <SelectItem value="price_asc">السعر: من الأقل للأعلى</SelectItem>
+                    <SelectItem value="price_desc">السعر: من الأعلى للأقل</SelectItem>
+                    <SelectItem value="newest">الأحدث</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Mobile Filter Button */}
+                <Button
+                  variant="outline"
+                  className="lg:hidden"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  الفلاتر
+                </Button>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              className="lg:hidden"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              الفلاتر
-            </Button>
+
+            {/* Active Filter Pills */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-muted-foreground">الفلاتر النشطة:</span>
+                
+                {search && (
+                  <button
+                    onClick={() => removeFilter("search")}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+                  >
+                    بحث: {search}
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+                
+                {categoryId && (
+                  <button
+                    onClick={() => removeFilter("categoryId")}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+                  >
+                    تصنيف
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+                
+                {selectedBrands.map(brand => (
+                  <button
+                    key={brand}
+                    onClick={() => removeFilter("brands", brand)}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-secondary/10 text-secondary-foreground rounded-full text-sm hover:bg-secondary/20 transition-colors"
+                  >
+                    {brand}
+                    <X className="w-3 h-3" />
+                  </button>
+                ))}
+                
+                {(paramMinPrice || paramMaxPrice) && (
+                  <button
+                    onClick={() => {
+                      const newParams = new URLSearchParams(searchParams);
+                      newParams.delete("minPrice");
+                      newParams.delete("maxPrice");
+                      setSearchParams(newParams);
+                    }}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-accent/10 text-accent rounded-full text-sm hover:bg-accent/20 transition-colors"
+                  >
+                    السعر: {localPriceRange[0].toLocaleString()} - {localPriceRange[1].toLocaleString()} ج.م
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+                
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-destructive hover:underline"
+                >
+                  مسح الكل
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
@@ -228,7 +392,7 @@ const Products = () => {
                     إعادة المحاولة
                   </Button>
                 </div>
-              ) : filteredProducts.length === 0 ? (
+              ) : sortedProducts.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-muted-foreground text-lg mb-4">
                     لا توجد منتجات تطابق معايير البحث
@@ -239,7 +403,7 @@ const Products = () => {
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredProducts.map((product, index) => (
+                  {sortedProducts.map((product, index) => (
                     <div
                       key={product._id}
                       className="animate-fade-up"

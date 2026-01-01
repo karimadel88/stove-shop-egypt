@@ -263,6 +263,7 @@ export interface Review {
 export interface ContactInfo {
   email: string;
   phone: string;
+  whatsapp?: string;
   address: string;
 }
 
@@ -275,6 +276,8 @@ export interface SocialLinks {
 
 export interface Settings {
   storeName: string;
+  logoId?: string | Media; // Can be string ID or populated Media object
+  logo?: Media;
   currency: string;
   taxRate: number;
   taxName: string;

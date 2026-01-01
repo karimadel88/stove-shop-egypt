@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { settingsApi } from '@/lib/api';
-import { Settings as SettingsType } from '@/types/admin';
+import { settingsApi, mediaApi } from '@/lib/api';
+import { Settings as SettingsType, Media } from '@/types/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Settings as SettingsIcon, Loader2, Store, DollarSign, Phone, Globe } from 'lucide-react';
+import { Settings as SettingsIcon, Loader2, Store, DollarSign, Phone, Globe, Upload, X, Image as ImageIcon, MessageCircle } from 'lucide-react';
 
 export default function Settings() {
   const [settings, setSettings] = useState<SettingsType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   useEffect(() => {
     settingsApi.get()
@@ -20,6 +21,39 @@ export default function Settings() {
       .catch(() => toast.error('فشل في تحميل الإعدادات'))
       .finally(() => setIsLoading(false));
   }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !settings) return;
+
+    setIsUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await mediaApi.upload(formData);
+      const uploadedMedia: Media = response.data;
+      
+      setSettings({
+        ...settings,
+        logoId: uploadedMedia._id,
+        logo: uploadedMedia,
+      });
+      toast.success('تم رفع الشعار بنجاح');
+    } catch (error) {
+      toast.error('فشل في رفع الشعار');
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    if (!settings) return;
+    setSettings({
+      ...settings,
+      logoId: undefined,
+      logo: undefined,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +72,16 @@ export default function Settings() {
   if (isLoading) return <div className="space-y-6"><Skeleton className="h-10 w-48" /><Skeleton className="h-64 w-full" /></div>;
   if (!settings) return <p className="text-center py-12 text-muted-foreground">فشل في تحميل الإعدادات</p>;
 
+  // Helper to get logo URL from either logoId (populated) or logo field
+  const getLogoUrl = (): string | undefined => {
+    if (settings.logoId && typeof settings.logoId === 'object' && 'url' in settings.logoId) {
+      return settings.logoId.url;
+    }
+    return settings.logo?.url;
+  };
+
+  const logoUrl = getLogoUrl();
+
   return (
     <div className="space-y-6">
       <div>
@@ -47,7 +91,9 @@ export default function Settings() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-5 w-5" />معلومات المتجر</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Store className="h-5 w-5" />معلومات المتجر</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>اسم المتجر</Label>
@@ -56,6 +102,62 @@ export default function Settings() {
             <div className="space-y-2">
               <Label>العملة</Label>
               <Input value={settings.currency} onChange={(e) => setSettings({ ...settings, currency: e.target.value })} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Logo Upload Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><ImageIcon className="h-5 w-5" />شعار المتجر</CardTitle>
+            <CardDescription>يظهر الشعار في رأس الموقع والفواتير</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-6">
+              {/* Logo Preview */}
+              <div className="relative w-32 h-32 border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center bg-muted/50 overflow-hidden">
+                {logoUrl ? (
+                  <>
+                    <img 
+                      src={logoUrl} 
+                      alt="شعار المتجر" 
+                      className="w-full h-full object-contain" 
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="absolute top-1 right-1 p-1 bg-destructive text-white rounded-full hover:bg-destructive/90"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </>
+                ) : (
+                  <ImageIcon className="w-12 h-12 text-muted-foreground/50" />
+                )}
+              </div>
+
+              {/* Upload Button */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="logo-upload" className="cursor-pointer">
+                  <div className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-muted transition-colors w-fit">
+                    {isUploadingLogo ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    <span>{isUploadingLogo ? 'جاري الرفع...' : 'رفع شعار جديد'}</span>
+                  </div>
+                </Label>
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  disabled={isUploadingLogo}
+                />
+                <p className="text-xs text-muted-foreground">PNG, JPG أو SVG. الحد الأقصى 2MB</p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -77,13 +179,28 @@ export default function Settings() {
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5" />التواصل</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>البريد الإلكتروني</Label>
-              <Input value={settings.contactInfo?.email || ''} onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, email: e.target.value } })} dir="ltr" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>البريد الإلكتروني</Label>
+                <Input value={settings.contactInfo?.email || ''} onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, email: e.target.value } })} dir="ltr" />
+              </div>
+              <div className="space-y-2">
+                <Label>الهاتف</Label>
+                <Input value={settings.contactInfo?.phone || ''} onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, phone: e.target.value } })} dir="ltr" />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label>الهاتف</Label>
-              <Input value={settings.contactInfo?.phone || ''} onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, phone: e.target.value } })} dir="ltr" />
+              <Label className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-green-500" />
+                رقم واتساب
+              </Label>
+              <Input 
+                value={settings.contactInfo?.whatsapp || ''} 
+                onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, whatsapp: e.target.value } })} 
+                placeholder="201234567890"
+                dir="ltr" 
+              />
+              <p className="text-xs text-muted-foreground">رقم الهاتف الدولي بدون + أو 00 (مثال: 201234567890)</p>
             </div>
             <div className="space-y-2">
               <Label>العنوان</Label>
@@ -116,3 +233,4 @@ export default function Settings() {
     </div>
   );
 }
+

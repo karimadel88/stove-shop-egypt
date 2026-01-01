@@ -155,7 +155,7 @@ const Contact = () => {
                   تواصل معنا مباشرة عبر واتساب للرد السريع
                 </p>
                 <a
-                  href="https://wa.me/201234567890"
+                  href={`https://wa.me/${(settings?.contactInfo?.whatsapp || '').replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

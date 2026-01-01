@@ -4,29 +4,27 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { useSettings } from "@/context/SettingsContext";
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { shopApi } from "@/lib/api";
 
 const Header = () => {
   const { totalItems } = useCart();
   const { settings } = useSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categories, setCategories] = useState<{_id: string, name: string, parentId?: string}[]>([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const { shopApi } = await import("@/lib/api");
-        const response = await shopApi.getCategories();
-        const data = Array.isArray(response.data) ? response.data : response.data.data || [];
-        setCategories(data);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+  // Use TanStack Query for categories with 10-minute cache
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await shopApi.getCategories();
+      const data = Array.isArray(response.data) ? response.data : response.data.data || [];
+      return data as {_id: string, name: string, parentId?: string}[];
+    },
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +42,18 @@ const Header = () => {
         <div className="flex items-center gap-4 lg:gap-8 justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
-              <Flame className="w-6 h-6" />
-            </div>
+            {/* Get logo URL from settings - logoId may be populated object */}
+            {settings?.logoId && typeof settings.logoId === 'object' && 'url' in settings.logoId ? (
+              <img 
+                src={settings.logoId.url} 
+                alt={settings?.storeName || "المتجر"} 
+                className="h-10 w-auto max-w-[120px] object-contain group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
+                <Flame className="w-6 h-6" />
+              </div>
+            )}
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold tracking-tight">
                 {settings?.storeName || "مصر للبوتجازات"}

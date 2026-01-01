@@ -40,14 +40,24 @@ export interface ShopCategory {
   isActive: boolean;
 }
 
+// Media object for populated references
+export interface ShopMediaRef {
+  _id: string;
+  url: string;
+  filename?: string;
+}
+
 export interface ShopSettings {
   storeName: string;
+  logoId?: string | ShopMediaRef; // Can be string ID or populated object
+  logoUrl?: string;
   currency: string;
   taxRate: number;
   taxName: string;
   contactInfo: {
     email: string;
     phone: string;
+    whatsapp?: string;
     address: string;
   };
   socialLinks: {

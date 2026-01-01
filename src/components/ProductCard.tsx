@@ -1,11 +1,11 @@
+import { memo, useState } from "react";
 import { Product } from "@/types/product";
 import { ShopProduct } from "@/types/shop";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart, Check, Package } from "lucide-react";
+import { ShoppingCart, Check, Package, Heart, Plus, Truck, Star, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
 interface ProductCardProps {
   product: Product | ShopProduct;
@@ -29,7 +29,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
       name: product.name,
       description: product.description || '',
       price: product.price,
-      originalPrice: product.compareAtPrice,
       originalPrice: product.compareAtPrice,
       image: (product.images || product.imageIds)?.[0]?.url || '',
       brand: product.name.split(' ')[0], // Extract brand from name
@@ -79,14 +78,35 @@ const ProductCard = ({ product }: ProductCardProps) => {
     ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
     : 0;
 
+  // Wishlist state (local for now - can be connected to backend later)
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Get stock quantity for low stock warning
+  const stockQuantity = 'quantity' in product ? product.quantity : 10;
+  const isLowStock = inStock && stockQuantity > 0 && stockQuantity <= 5;
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
+    toast.success(isWishlisted ? "تم الإزالة من المفضلة" : "تمت الإضافة للمفضلة");
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleAddToCart(e);
+  };
+
   return (
     <Link to={`/product/${productId}`}>
-      <div className="bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-hover transition-all duration-300 group cursor-pointer">
+      <div className="bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-hover transition-all duration-300 group cursor-pointer border border-transparent hover:border-primary/20 h-full flex flex-col">
         <div className="relative aspect-square bg-muted overflow-hidden">
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={product.name}
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -94,11 +114,58 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <Package className="w-16 h-16 text-muted-foreground" />
             </div>
           )}
+          
+          {/* Wishlist Heart Button - Top Left */}
+          <button
+            onClick={handleWishlistToggle}
+            className={`absolute top-3 left-3 p-2 rounded-full transition-all duration-200 ${
+              isWishlisted 
+                ? "bg-destructive text-white" 
+                : "bg-white/80 text-muted-foreground hover:bg-white hover:text-destructive"
+            } shadow-sm`}
+          >
+            <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+          </button>
+
+          {/* Discount Badge - Top Right */}
           {discount > 0 && (
-            <span className="absolute top-4 right-4 bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-sm font-bold">
-              خصم {discount}%
+            <span className="absolute top-3 right-3 bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-bold shadow-sm">
+              -{discount}%
             </span>
           )}
+
+          {/* Brand Badge - Top Right (below discount if exists, else at top) */}
+          <span className={`absolute right-3 bg-secondary/90 text-secondary-foreground px-2 py-0.5 rounded text-xs font-medium ${discount > 0 ? 'top-10' : 'top-3'}`}>
+            {brand}
+          </span>
+
+          {/* Low Stock Warning */}
+          {isLowStock && (
+            <div className="absolute bottom-3 right-3 left-3 flex items-center gap-1 bg-amber-500/90 text-white px-2 py-1 rounded text-xs font-medium">
+              <AlertTriangle className="w-3 h-3" />
+              باقي {stockQuantity} فقط!
+            </div>
+          )}
+
+          {/* Quick Add Button - Floating */}
+          {inStock && !isInCart && (
+            <button
+              onClick={handleQuickAdd}
+              className="absolute bottom-3 left-3 p-2.5 bg-primary text-primary-foreground rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* In Cart Indicator */}
+          {isInCart && (
+            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+              <Check className="w-3 h-3" />
+              في السلة
+            </div>
+          )}
+
+          {/* Out of Stock Overlay */}
           {!inStock && (
             <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
               <span className="bg-muted text-muted-foreground px-4 py-2 rounded-lg font-semibold">
@@ -106,12 +173,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </span>
             </div>
           )}
-          <span className="absolute top-4 left-4 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-            {brand}
-          </span>
         </div>
 
-        <div className="p-5">
+        <div className="p-5 flex-1 flex flex-col">
           <h3 className="font-bold text-foreground mb-2 line-clamp-2 leading-relaxed group-hover:text-primary transition-colors">
             {product.name}
           </h3>
@@ -129,7 +193,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </div>
           )}
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-auto">
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-primary">
                 {product.price.toLocaleString()} ج.م
@@ -167,4 +231,4 @@ const ProductCard = ({ product }: ProductCardProps) => {
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);

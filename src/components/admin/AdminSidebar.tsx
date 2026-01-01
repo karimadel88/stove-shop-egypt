@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -48,7 +49,7 @@ const menuItems = [
   { title: 'المستخدمين', path: '/admin/users', icon: UserCog },
 ];
 
-export function AdminSidebar() {
+function AdminSidebarComponent() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -125,4 +126,8 @@ export function AdminSidebar() {
   );
 }
 
+// Memoize to prevent re-renders when parent (AdminLayout) re-renders on navigation
+export const AdminSidebar = memo(AdminSidebarComponent);
+
 export default AdminSidebar;
+

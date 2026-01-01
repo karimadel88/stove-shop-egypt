@@ -8,6 +8,7 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 import { Loader2 } from "lucide-react";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 // Lazy load Customer pages
 const Index = lazy(() => import("./pages/Index"));
@@ -111,6 +112,7 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
+              <FloatingWhatsApp />
             </BrowserRouter>
           </CartProvider>
         </SettingsProvider>
