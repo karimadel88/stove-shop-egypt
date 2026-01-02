@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { CheckCircle, CreditCard, Truck, Ticket } from "lucide-react";
 import { shopApi } from "@/lib/api";
 import { City, Country } from "@/types/shop";
+import { getMediaUrl } from "@/lib/utils";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -391,7 +392,7 @@ const Checkout = () => {
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-3">
                       <img
-                        src={item.image}
+                        src={getMediaUrl(item.image)}
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded-lg bg-muted"
                       />

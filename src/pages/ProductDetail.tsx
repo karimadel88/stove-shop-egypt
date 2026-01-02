@@ -21,6 +21,7 @@ import {
   Package,
   AlertCircle
 } from "lucide-react";
+import { getMediaUrl } from "@/lib/utils";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -182,7 +183,7 @@ const ProductDetail = () => {
               <div className="relative aspect-square bg-muted rounded-2xl overflow-hidden shadow-soft group">
                 {mainImage ? (
                   <img
-                    src={mainImage}
+                    src={getMediaUrl(mainImage)}
                     alt={product.name}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -221,7 +222,7 @@ const ProductDetail = () => {
                       }`}
                     >
                       <img 
-                        src={img.url} 
+                        src={getMediaUrl(img.url)} 
                         alt={`${product.name} - ${index + 1}`} 
                         className="w-full h-full object-cover"
                       />
@@ -359,7 +360,7 @@ const ProductDetail = () => {
                         <div className="aspect-square rounded-lg overflow-hidden mb-4 bg-muted">
                           {pImg ? (
                             <img
-                              src={pImg}
+                              src={getMediaUrl(pImg)}
                               alt={p.name}
                               className="w-full h-full object-cover"
                             />

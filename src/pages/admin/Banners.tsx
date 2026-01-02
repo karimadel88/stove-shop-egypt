@@ -44,6 +44,7 @@ import {
   Images,
 } from 'lucide-react';
 import ImageUpload from '@/components/admin/ImageUpload';
+import { getMediaUrl } from '@/lib/utils';
 
 interface BannerFormData {
   title: string;
@@ -210,7 +211,7 @@ export default function Banners() {
                     <TableCell>
                       <div className="h-12 w-20 rounded-md bg-muted overflow-hidden border">
                         {getImageUrl(banner) ? (
-                            <img src={getImageUrl(banner)!} alt={banner.title} className="h-full w-full object-cover" />
+                            <img src={getMediaUrl(getImageUrl(banner)!)} alt={banner.title} className="h-full w-full object-cover" />
                         ) : (
                             <div className="h-full w-full flex items-center justify-center text-muted-foreground">
                                 <ImageIcon className="h-5 w-5" />
@@ -282,10 +283,14 @@ export default function Banners() {
                     value={formData.imageId ? [formData.imageId] : []}
                     onChange={(ids) => {
                         const id = ids[0];
-                        setFormData({ 
-                            ...formData, 
-                            imageId: typeof id === 'object' ? id._id : (id || '') 
-                        })
+                        if (id) {
+                            setFormData({ 
+                                ...formData, 
+                                imageId: typeof id === 'object' ? (id as ShopMedia)._id : (id as string) 
+                            })
+                        } else {
+                            setFormData({ ...formData, imageId: '' })
+                        }
                     }}
                     maxFiles={1}
                     />

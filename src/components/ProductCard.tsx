@@ -6,6 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingCart, Check, Package, Heart, Plus, Truck, Star, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { getMediaUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product | ShopProduct;
@@ -104,7 +105,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="relative aspect-square bg-muted overflow-hidden">
           {imageUrl ? (
             <img
-              src={imageUrl}
+              src={getMediaUrl(imageUrl)}
               alt={product.name}
               loading="lazy"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

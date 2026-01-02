@@ -56,6 +56,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import ImageUpload from '@/components/admin/ImageUpload';
+import { getMediaUrl } from '@/lib/utils';
 
 interface ProductFormData {
   name: string;
@@ -215,7 +216,6 @@ export default function Products() {
     return category?.name || '-';
   };
 
-  const getMediaUrl = (m: any) => m.url;
 
   return (
     <div className="space-y-6">
@@ -294,7 +294,7 @@ export default function Products() {
                                 if (mainImage?.url) {
                                   return (
                                     <img
-                                      src={getMediaUrl(mainImage)}
+                                      src={getMediaUrl(mainImage.url)}
                                       alt={product.name}
                                       className="h-full w-full object-cover"
                                     />

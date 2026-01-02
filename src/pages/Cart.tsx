@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { getMediaUrl } from "@/lib/utils";
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
@@ -49,7 +50,7 @@ const Cart = () => {
                   <div className="w-24 h-24 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
                     {item.image ? (
                       <img
-                        src={item.image}
+                        src={getMediaUrl(item.image)}
                         alt={item.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {

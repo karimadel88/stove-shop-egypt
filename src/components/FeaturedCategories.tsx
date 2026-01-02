@@ -4,6 +4,7 @@ import { shopApi } from "@/lib/api";
 import { ShopCategory } from "@/types/shop";
 import { LayoutGrid } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getMediaUrl } from "@/lib/utils";
 
 const FeaturedCategories = () => {
   const [categories, setCategories] = useState<ShopCategory[]>([]);
@@ -62,7 +63,7 @@ const FeaturedCategories = () => {
                     const imageUrl = category.image?.url || category.imageId?.url;
                     return imageUrl && !imageLoadErrors[category._id] ? (
                       <img
-                        src={imageUrl}
+                        src={getMediaUrl(imageUrl)}
                         alt={category.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         onError={() => handleImageError(category._id)}

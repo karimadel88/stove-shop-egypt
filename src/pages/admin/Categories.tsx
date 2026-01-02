@@ -36,6 +36,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Layers, Loader2, ChevronDown, ChevronLeft, FolderOpen, Folder, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getMediaUrl } from '@/lib/utils';
 import ImageUpload from '@/components/admin/ImageUpload';
 
 interface CategoryFormData {
@@ -106,7 +107,7 @@ function CategoryTreeItem({
               if (img?.url) {
                 return (
                   <img
-                    src={img.url}
+                    src={getMediaUrl(img.url)}
                     alt={category.name}
                     className="h-full w-full object-cover"
                   />
@@ -280,7 +281,6 @@ export default function Categories() {
     return categories.filter((c) => !descendants.has(c._id));
   };
 
-  const getMediaUrl = (m: any) => m.url;
 
   return (
     <div className="space-y-6">

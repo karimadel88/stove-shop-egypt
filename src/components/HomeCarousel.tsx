@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { shopApi } from "@/lib/api";
 import { ShopBanner } from "@/types/shop";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getMediaUrl } from "@/lib/utils";
 
 const HomeCarousel = () => {
   const plugin = useRef(
@@ -64,7 +65,7 @@ const HomeCarousel = () => {
                 {/* Background Image */}
                 {(banner.image?.url || (typeof banner.imageId === 'object' && banner.imageId?.url)) ? (
                     <img 
-                      src={banner.image?.url || (banner.imageId as any).url} 
+                      src={getMediaUrl(banner.image?.url || (banner.imageId as any).url)} 
                       alt={banner.title} 
                       className="absolute inset-0 w-full h-full object-cover"
                     />

@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Upload, X, Image as ImageIcon, Loader2, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getMediaUrl } from '@/lib/utils';
 
 interface ImageUploadProps {
   value: (string | Media)[];
@@ -125,7 +126,7 @@ export default function ImageUpload({
     onChange(newIds);
   };
 
-  const getMediaUrl = (m: Media) => m.url;
+  const getMediaUrlFromMedia = (m: Media) => getMediaUrl(m.url);
 
   return (
     <div className="space-y-4">
@@ -133,7 +134,7 @@ export default function ImageUpload({
         {previews.map((media) => (
           <div key={media._id} className="relative aspect-square rounded-lg border bg-muted overflow-hidden group">
             <img
-              src={getMediaUrl(media)}
+              src={getMediaUrlFromMedia(media)}
               alt={media.originalName}
               className="w-full h-full object-cover"
             />

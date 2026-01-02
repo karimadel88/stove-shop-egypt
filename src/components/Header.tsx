@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { shopApi } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getMediaUrl } from "@/lib/utils";
 
 const Header = () => {
   const { totalItems } = useCart();
@@ -51,7 +52,7 @@ const Header = () => {
             ) : settings?.logoId && typeof settings.logoId === 'object' && 'url' in settings.logoId ? (
               <>
                 <img 
-                  src={settings.logoId.url} 
+                  src={getMediaUrl(settings.logoId.url)} 
                   alt={settings?.storeName || ""} 
                   className="h-10 w-auto max-w-[120px] object-contain group-hover:scale-105 transition-transform"
                 />

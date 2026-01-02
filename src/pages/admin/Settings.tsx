@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { getMediaUrl } from '@/lib/utils';
 import { Settings as SettingsIcon, Loader2, Store, DollarSign, Phone, Globe, Upload, X, Image as ImageIcon, MessageCircle } from 'lucide-react';
 
 export default function Settings() {
@@ -119,7 +120,7 @@ export default function Settings() {
                 {logoUrl ? (
                   <>
                     <img 
-                      src={logoUrl} 
+                      src={getMediaUrl(logoUrl)} 
                       alt="شعار المتجر" 
                       className="w-full h-full object-contain" 
                     />
