@@ -6,15 +6,17 @@ import { ShopSettings } from "@/types/shop";
 interface SettingsContextType {
   settings: ShopSettings | null;
   isLoading: boolean;
+  isError: boolean;
 }
 
 const SettingsContext = createContext<SettingsContextType>({
   settings: null,
   isLoading: true,
+  isError: false,
 });
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const { data: settings = null, isLoading } = useQuery({
+  const { data: settings = null, isLoading, isError } = useQuery({
     queryKey: ['shop-settings'],
     queryFn: async () => {
       const response = await shopApi.getSettings();
@@ -25,11 +27,12 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   });
 
   return (
-    <SettingsContext.Provider value={{ settings, isLoading }}>
+    <SettingsContext.Provider value={{ settings, isLoading, isError }}>
       {children}
     </SettingsContext.Provider>
   );
 };
 
 export const useSettings = () => useContext(SettingsContext);
+
 

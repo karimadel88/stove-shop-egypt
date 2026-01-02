@@ -8,10 +8,11 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { shopApi } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Header = () => {
   const { totalItems } = useCart();
-  const { settings } = useSettings();
+  const { settings, isLoading: settingsLoading } = useSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -42,26 +43,39 @@ const Header = () => {
         <div className="flex items-center gap-4 lg:gap-8 justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group shrink-0">
-            {/* Get logo URL from settings - logoId may be populated object */}
-            {settings?.logoId && typeof settings.logoId === 'object' && 'url' in settings.logoId ? (
-              <img 
-                src={settings.logoId.url} 
-                alt={settings?.storeName || "المتجر"} 
-                className="h-10 w-auto max-w-[120px] object-contain group-hover:scale-105 transition-transform"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
-                <Flame className="w-6 h-6" />
-              </div>
-            )}
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-bold tracking-tight">
-                {settings?.storeName || "مصر للبوتجازات"}
-              </h1>
-            </div>
+            {settingsLoading ? (
+              <>
+                <Skeleton className="w-10 h-10 rounded-lg" />
+                <Skeleton className="hidden sm:block w-32 h-6" />
+              </>
+            ) : settings?.logoId && typeof settings.logoId === 'object' && 'url' in settings.logoId ? (
+              <>
+                <img 
+                  src={settings.logoId.url} 
+                  alt={settings?.storeName || ""} 
+                  className="h-10 w-auto max-w-[120px] object-contain group-hover:scale-105 transition-transform"
+                />
+                {settings?.storeName && (
+                  <div className="hidden sm:block">
+                    <h1 className="text-xl font-bold tracking-tight">
+                      {settings.storeName}
+                    </h1>
+                  </div>
+                )}
+              </>
+            ) : settings?.storeName ? (
+              <>
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
+                  <Flame className="w-6 h-6" />
+                </div>
+                <div className="hidden sm:block">
+                  <h1 className="text-xl font-bold tracking-tight">
+                    {settings.storeName}
+                  </h1>
+                </div>
+              </>
+            ) : null}
           </Link>
-
-          {/* Search Bar - Center */}
           <form onSubmit={handleSearch} className="flex-1 max-w-2xl hidden md:flex relative">
             <Input 
               type="search" 
