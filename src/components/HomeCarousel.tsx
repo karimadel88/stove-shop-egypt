@@ -14,15 +14,26 @@ import { ShopBanner } from "@/types/shop";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMediaUrl } from "@/lib/utils";
 
-const HomeCarousel = () => {
+interface HomeCarouselProps {
+  banners?: ShopBanner[];
+  isLoading?: boolean;
+}
+
+const HomeCarousel = ({ banners: initialBanners, isLoading: initialLoading }: HomeCarouselProps) => {
   const plugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );
   
-  const [banners, setBanners] = useState<ShopBanner[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [banners, setBanners] = useState<ShopBanner[]>(initialBanners || []);
+  const [isLoading, setIsLoading] = useState(initialLoading ?? !initialBanners);
 
   useEffect(() => {
+    if (initialBanners) {
+      setBanners(initialBanners);
+      setIsLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchBanners = async () => {
       try {
         const response = await shopApi.getBanners();
@@ -34,7 +45,7 @@ const HomeCarousel = () => {
       }
     };
     fetchBanners();
-  }, []);
+  }, [initialBanners, initialLoading]);
 
   if (isLoading) {
     return (

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { shopApi } from "@/lib/api";
@@ -90,8 +88,7 @@ const ProductDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
+      <div className="flex flex-col">
         <main className="flex-1 py-12 container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12">
             <Skeleton className="aspect-square rounded-2xl w-full" />
@@ -104,15 +101,13 @@ const ProductDetail = () => {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
+      <div className="flex flex-col">
         <main className="flex-1 flex items-center justify-center py-16">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -125,7 +120,6 @@ const ProductDetail = () => {
             </Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -164,8 +158,7 @@ const ProductDetail = () => {
   const mainImage = mediaList[activeImageIndex]?.url || null;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
           {/* Breadcrumb */}
@@ -381,7 +374,6 @@ const ProductDetail = () => {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

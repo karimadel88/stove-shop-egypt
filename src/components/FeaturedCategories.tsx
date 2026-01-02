@@ -6,9 +6,14 @@ import { LayoutGrid } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMediaUrl } from "@/lib/utils";
 
-const FeaturedCategories = () => {
-  const [categories, setCategories] = useState<ShopCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface FeaturedCategoriesProps {
+  categories?: ShopCategory[];
+  isLoading?: boolean;
+}
+
+const FeaturedCategories = ({ categories: initialCategories, isLoading: initialLoading }: FeaturedCategoriesProps) => {
+  const [categories, setCategories] = useState<ShopCategory[]>(initialCategories || []);
+  const [isLoading, setIsLoading] = useState(initialLoading ?? !initialCategories);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
 
   const handleImageError = (id: string) => {
@@ -16,6 +21,12 @@ const FeaturedCategories = () => {
   };
 
   useEffect(() => {
+    if (initialCategories) {
+      setCategories(initialCategories);
+      setIsLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchCategories = async () => {
       try {
         const response = await shopApi.getCategories();
@@ -29,7 +40,7 @@ const FeaturedCategories = () => {
     };
 
     fetchCategories();
-  }, []);
+  }, [initialCategories, initialLoading]);
 
   if (!isLoading && categories.length === 0) return null;
 

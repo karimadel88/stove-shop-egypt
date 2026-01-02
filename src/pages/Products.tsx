@@ -1,7 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
 import { useSearchParams } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { shopApi } from "@/lib/api";
 import { ShopProduct } from "@/types/shop";
@@ -28,12 +26,12 @@ const Products = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Extract unique brands and calculate price range from fetched products
-  // These should be calculated from products but NOT fed back into the fetch params automatically
-  const brands = [...new Set(products.map((p) => p.name.split(' ')[0]))]; 
-  const availableMaxPrice = products.length > 0 ? Math.max(...products.map((p) => p.price)) : 20000;
-  const availableMinPrice = products.length > 0 ? Math.min(...products.map((p) => p.price)) : 0;
+  // Memoized to prevent O(N) recalculations on every render
+  const brands = useMemo(() => [...new Set(products.map((p) => p.name.split(' ')[0]))], [products]);
+  const availableMaxPrice = useMemo(() => products.length > 0 ? Math.max(...products.map((p) => p.price)) : 20000, [products]);
+  const availableMinPrice = useMemo(() => products.length > 0 ? Math.min(...products.map((p) => p.price)) : 0, [products]);
 
-  const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+  const selectedBrands = useMemo(() => searchParams.get("brands")?.split(",").filter(Boolean) || [], [searchParams]);
   
   // URL Params for filtering
   const paramMinPrice = searchParams.get("minPrice");
@@ -124,13 +122,13 @@ const Products = () => {
   };
 
   // Client-side filtering for brands (if needed)
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = useMemo(() => products.filter((product) => {
     if (selectedBrands.length > 0) {
       const productBrand = product.name.split(' ')[0];
       if (!selectedBrands.includes(productBrand)) return false;
     }
     return true;
-  });
+  }), [products, selectedBrands]);
 
   const hasActiveFilters = selectedBrands.length > 0 || categoryId || search ||
     paramMinPrice || paramMaxPrice;
@@ -149,7 +147,7 @@ const Products = () => {
   };
 
   // Client-side sorting
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = useMemo(() => [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case "price_asc":
         return a.price - b.price;
@@ -160,7 +158,7 @@ const Products = () => {
       default:
         return 0; // featured - keep original order
     }
-  });
+  }), [filteredProducts, sortBy]);
 
   // Remove specific filter
   const removeFilter = (key: string, value?: string) => {
@@ -178,7 +176,18 @@ const Products = () => {
     setSearchParams(newParams);
   };
 
-  const FilterPanel = () => (
+  // Extract FilterPanel to a proper component to isolate re-renders
+  const FilterPanel = memo(({ 
+    brands, 
+    selectedBrands, 
+    toggleBrand, 
+    availableMinPrice, 
+    availableMaxPrice, 
+    localPriceRange, 
+    handlePriceChange,
+    hasActiveFilters,
+    clearFilters
+  }: any) => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-foreground flex items-center gap-2">
@@ -197,7 +206,7 @@ const Products = () => {
         <div className="space-y-4">
           <h4 className="font-semibold text-foreground">الماركة</h4>
           <div className="space-y-3">
-            {brands.map((brand) => (
+            {brands.map((brand: string) => (
               <div key={brand} className="flex items-center gap-3">
                 <Checkbox
                   id={brand}
@@ -227,11 +236,12 @@ const Products = () => {
         </div>
       </div>
     </div>
-  );
+  ));
+  
+  FilterPanel.displayName = "FilterPanel";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
           {/* Header Section - Amazon/Noon Style */}
@@ -343,10 +353,19 @@ const Products = () => {
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
-            {/* Desktop Filters */}
             <aside className="hidden lg:block">
               <div className="bg-card rounded-xl p-6 shadow-soft sticky top-24">
-                <FilterPanel />
+                <FilterPanel 
+                  brands={brands}
+                  selectedBrands={selectedBrands}
+                  toggleBrand={toggleBrand}
+                  availableMinPrice={availableMinPrice}
+                  availableMaxPrice={availableMaxPrice}
+                  localPriceRange={localPriceRange}
+                  handlePriceChange={handlePriceChange}
+                  hasActiveFilters={hasActiveFilters}
+                  clearFilters={clearFilters}
+                />
               </div>
             </aside>
 
@@ -360,7 +379,17 @@ const Products = () => {
                       <X className="w-5 h-5" />
                     </Button>
                   </div>
-                  <FilterPanel />
+                  <FilterPanel 
+                    brands={brands}
+                    selectedBrands={selectedBrands}
+                    toggleBrand={toggleBrand}
+                    availableMinPrice={availableMinPrice}
+                    availableMaxPrice={availableMaxPrice}
+                    localPriceRange={localPriceRange}
+                    handlePriceChange={handlePriceChange}
+                    hasActiveFilters={hasActiveFilters}
+                    clearFilters={clearFilters}
+                  />
                   <Button
                     variant="gold"
                     className="w-full mt-6"
@@ -418,7 +447,6 @@ const Products = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

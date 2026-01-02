@@ -19,6 +19,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const CustomerLayout = lazy(() => import("./components/CustomerLayout"));
 
 // Lazy load Admin pages
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
@@ -67,55 +68,53 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <SettingsProvider>
-          <TitleUpdater />
-          <CartProvider>
-            <Toaster />
-            <Sonner position="top-center" />
-            <BrowserRouter>
+        <BrowserRouter>
+          <SettingsProvider>
+            <TitleUpdater />
+            <CartProvider>
+              <Toaster />
+              <Sonner position="top-center" />
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   {/* Customer routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/offers" element={<Offers />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<Checkout />} />
+                  <Route element={<CustomerLayout />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/offers" element={<Offers />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
 
                   {/* Admin routes */}
                   <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute>
-                        <AdminLayout />
-                      </ProtectedRoute>
-                    }
-                  >
-                    <Route index element={<Dashboard />} />
-                    <Route path="products" element={<AdminProducts />} />
-                    <Route path="categories" element={<Categories />} />
-                    <Route path="orders" element={<Orders />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="coupons" element={<Coupons />} />
-                    <Route path="shipping" element={<Shipping />} />
-                    <Route path="locations" element={<Locations />} />
-                    <Route path="banners" element={<Banners />} />
-                    <Route path="messages" element={<ContactMessages />} />
-                    <Route path="reviews" element={<Reviews />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="users" element={<Users />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<Dashboard />} />
+                      <Route path="products" element={<AdminProducts />} />
+                      <Route path="categories" element={<Categories />} />
+                      <Route path="orders" element={<Orders />} />
+                      <Route path="customers" element={<Customers />} />
+                      <Route path="coupons" element={<Coupons />} />
+                      <Route path="shipping" element={<Shipping />} />
+                      <Route path="locations" element={<Locations />} />
+                      <Route path="banners" element={<Banners />} />
+                      <Route path="messages" element={<ContactMessages />} />
+                      <Route path="reviews" element={<Reviews />} />
+                      <Route path="settings" element={<Settings />} />
+                      <Route path="users" element={<Users />} />
+                    </Route>
                   </Route>
 
-                  <Route path="*" element={<NotFound />} />
+
                 </Routes>
               </Suspense>
               <FloatingWhatsApp />
-            </BrowserRouter>
-          </CartProvider>
-        </SettingsProvider>
+            </CartProvider>
+          </SettingsProvider>
+        </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

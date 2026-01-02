@@ -1,5 +1,4 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { Clock, Percent, Gift, Zap } from "lucide-react";
@@ -48,8 +47,7 @@ const Offers = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="gradient-gold py-16">
@@ -170,7 +168,6 @@ const Offers = () => {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

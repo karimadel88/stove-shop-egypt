@@ -14,10 +14,10 @@ import { getMediaUrl } from "@/lib/utils";
 const Header = () => {
   const { totalItems } = useCart();
   const { settings, isLoading: settingsLoading } = useSettings();
+  // Use TanStack Query for categories with 10-minute cache
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Use TanStack Query for categories with 10-minute cache
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {

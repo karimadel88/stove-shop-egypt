@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { categoriesApi } from '@/lib/api';
 import { Category, Media } from '@/types/admin';
 import { Button } from '@/components/ui/button';
@@ -61,24 +61,22 @@ interface CategoryTreeItemProps {
   category: Category;
   categories: Category[];
   level: number;
-  expandedIds: Set<string>;
-  onToggle: (id: string) => void;
   onEdit: (category: Category) => void;
   onDelete: (category: Category) => void;
 }
 
-function CategoryTreeItem({
+const CategoryTreeItem = memo(({
   category,
   categories,
   level,
-  expandedIds,
-  onToggle,
   onEdit,
   onDelete,
-}: CategoryTreeItemProps) {
+}: Omit<CategoryTreeItemProps, 'expandedIds' | 'onToggle'>) => {
+  const [isOpen, setIsOpen] = useState(false);
   const children = categories.filter((c) => c.parentId === category._id);
   const hasChildren = children.length > 0;
-  const isExpanded = expandedIds.has(category._id);
+
+  const toggleOpen = useCallback(() => setIsOpen(prev => !prev), []);
 
   return (
     <div>
@@ -91,8 +89,8 @@ function CategoryTreeItem({
       >
         <div className="flex items-center gap-2">
           {hasChildren ? (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onToggle(category._id)}>
-              {isExpanded ? (
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleOpen}>
+              {isOpen ? (
                 <ChevronDown className="h-4 w-4" />
               ) : (
                 <ChevronLeft className="h-4 w-4" />
@@ -134,7 +132,7 @@ function CategoryTreeItem({
           </Button>
         </div>
       </div>
-      {hasChildren && isExpanded && (
+      {hasChildren && isOpen && (
         <div>
           {children.map((child) => (
             <CategoryTreeItem
@@ -142,8 +140,6 @@ function CategoryTreeItem({
               category={child}
               categories={categories}
               level={level + 1}
-              expandedIds={expandedIds}
-              onToggle={onToggle}
               onEdit={onEdit}
               onDelete={onDelete}
             />
@@ -152,12 +148,11 @@ function CategoryTreeItem({
       )}
     </div>
   );
-}
+});
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -182,25 +177,13 @@ export default function Categories() {
     fetchCategories();
   }, []);
 
-  const toggleExpanded = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const openCreateDialog = () => {
+  const openCreateDialog = useCallback(() => {
     setEditingCategory(null);
     setFormData(defaultFormData);
     setIsFormOpen(true);
-  };
+  }, []);
 
-  const openEditDialog = (category: Category) => {
+  const openEditDialog = useCallback((category: Category) => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
@@ -211,12 +194,12 @@ export default function Categories() {
       imageId: category.imageId || '',
     });
     setIsFormOpen(true);
-  };
+  }, []);
 
-  const openDeleteDialog = (category: Category) => {
+  const openDeleteDialog = useCallback((category: Category) => {
     setDeletingCategory(category);
     setIsDeleteOpen(true);
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,10 +243,10 @@ export default function Categories() {
     }
   };
 
-  const rootCategories = categories.filter((c) => {
+  const rootCategories = useMemo(() => categories.filter((c) => {
     if (!c.parentId || c.parentId === 'none') return true;
     return !categories.some((parent) => parent._id === c.parentId);
-  });
+  }), [categories]);
 
   const getPossibleParents = (): Category[] => {
     if (!editingCategory) return categories;
@@ -322,8 +305,6 @@ export default function Categories() {
                   category={category}
                   categories={categories}
                   level={0}
-                  expandedIds={expandedIds}
-                  onToggle={toggleExpanded}
                   onEdit={openEditDialog}
                   onDelete={openDeleteDialog}
                 />

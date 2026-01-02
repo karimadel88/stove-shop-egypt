@@ -136,3 +136,12 @@ export interface ShopBanner {
   isActive: boolean;
   image?: ShopMedia; // Sometimes populated here
 }
+
+export interface HomeResponse {
+  banners: ShopBanner[];
+  categories: ShopCategory[];
+  featuredProducts: ShopProduct[];
+  newArrivals: ShopProduct[];
+  onSaleProducts: ShopProduct[];
+  settings: ShopSettings;
+}

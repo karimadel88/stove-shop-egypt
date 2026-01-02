@@ -1,5 +1,5 @@
-import { memo, useCallback } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { memo, useCallback, useMemo } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import {
   LayoutDashboard,
@@ -89,15 +89,22 @@ const MenuItemLink = memo(function MenuItemLink({ item, isExact }: MenuItemProps
 
 // Memoized menu list - renders stable list of memoized items
 const MenuList = memo(function MenuList() {
+  const location = useLocation();
+  // Check if current path starts with item path (for active state consistency)
+  // But NavLink handles this internally, so we just render the list.
+  // We use useMemo for the list generation to be extra safe.
+  
+  const items = useMemo(() => menuItems.map((item) => (
+    <MenuItemLink 
+      key={item.path} 
+      item={item} 
+      isExact={item.path === '/admin'} 
+    />
+  )), []);
+
   return (
     <SidebarMenu>
-      {menuItems.map((item) => (
-        <MenuItemLink 
-          key={item.path} 
-          item={item} 
-          isExact={item.path === '/admin'} 
-        />
-      ))}
+      {items}
     </SidebarMenu>
   );
 });
@@ -116,12 +123,16 @@ const SidebarHeaderContent = memo(function SidebarHeaderContent() {
 });
 
 // Memoized footer content - only re-renders if user changes
-interface FooterProps {
-  user: { firstName?: string; lastName?: string; role?: string } | null;
-  onLogout: () => void;
-}
+// Memoized footer content - independently consumes auth context
+const SidebarFooterContent = memo(function SidebarFooterContent() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-const SidebarFooterContent = memo(function SidebarFooterContent({ user, onLogout }: FooterProps) {
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate('/admin/login');
+  }, [logout, navigate]);
+
   return (
     <SidebarFooter className="border-t p-4">
       <div className="flex flex-col gap-2">
@@ -139,7 +150,7 @@ const SidebarFooterContent = memo(function SidebarFooterContent({ user, onLogout
         <Button
           variant="ghost"
           className="w-full justify-start text-muted-foreground hover:text-foreground"
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <LogOut className="ml-2 h-4 w-4" />
           تسجيل الخروج
@@ -150,14 +161,6 @@ const SidebarFooterContent = memo(function SidebarFooterContent({ user, onLogout
 });
 
 function AdminSidebarComponent() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = useCallback(() => {
-    logout();
-    navigate('/admin/login');
-  }, [logout, navigate]);
-
   return (
     <Sidebar side="right" className="border-l border-r-0">
       <SidebarHeaderContent />
@@ -171,7 +174,7 @@ function AdminSidebarComponent() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooterContent user={user} onLogout={handleLogout} />
+      <SidebarFooterContent />
     </Sidebar>
   );
 }

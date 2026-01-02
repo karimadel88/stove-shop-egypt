@@ -1,7 +1,8 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { shopApi } from "@/lib/api";
 import { ShopSettings } from "@/types/shop";
+import { useLocation } from "react-router-dom";
 
 interface SettingsContextType {
   settings: ShopSettings | null;
@@ -26,8 +27,13 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     retry: 2,
   });
 
+  const contextValue = useMemo(
+    () => ({ settings, isLoading, isError }),
+    [settings, isLoading, isError]
+  );
+
   return (
-    <SettingsContext.Provider value={{ settings, isLoading, isError }}>
+    <SettingsContext.Provider value={contextValue}>
       {children}
     </SettingsContext.Provider>
   );

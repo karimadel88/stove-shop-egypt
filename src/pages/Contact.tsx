@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,8 +56,7 @@ const Contact = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
+      <div className="flex flex-col">
         <main className="flex-1 flex items-center justify-center py-16">
           <div className="text-center max-w-md mx-auto px-4 animate-fade-up">
             <div className="w-24 h-24 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 shadow-gold">
@@ -74,14 +71,12 @@ const Contact = () => {
             </Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="flex flex-col">
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           {/* Header */}
@@ -271,7 +266,6 @@ const Contact = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

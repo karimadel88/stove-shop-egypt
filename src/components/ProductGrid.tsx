@@ -4,11 +4,29 @@ import { ShopProduct } from "@/types/shop";
 import ProductCard from "./ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProductGrid = () => {
-  const [products, setProducts] = useState<ShopProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface ProductGridProps {
+  products?: ShopProduct[];
+  isLoading?: boolean;
+  title?: string;
+  subtitle?: string;
+}
+
+const ProductGrid = ({ 
+  products: initialProducts, 
+  isLoading: initialLoading, 
+  title = "منتجاتنا المميزة",
+  subtitle = "اختر من بين أفضل الماركات العالمية والمحلية بأسعار تنافسية"
+}: ProductGridProps) => {
+  const [products, setProducts] = useState<ShopProduct[]>(initialProducts || []);
+  const [isLoading, setIsLoading] = useState(initialLoading ?? !initialProducts);
 
   useEffect(() => {
+    if (initialProducts) {
+      setProducts(initialProducts);
+      setIsLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchProducts = async () => {
       try {
         const response = await shopApi.listProducts({ limit: 6 });
@@ -21,22 +39,22 @@ const ProductGrid = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [initialProducts, initialLoading]);
 
   return (
     <section id="products" className="py-8 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-6">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            منتجاتنا المميزة
+            {title}
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            اختر من بين أفضل الماركات العالمية والمحلية بأسعار تنافسية
+            {subtitle}
           </p>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="aspect-square w-full rounded-2xl" />
@@ -46,7 +64,7 @@ const ProductGrid = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product, index) => (
               <div
                 key={product._id}

@@ -278,6 +278,9 @@ export const shopApi = {
 
   // Banners
   getBanners: () => api.get('/banners'),
+
+  // Home Page Consolidated Data
+  getHomeData: () => api.get('/home'),
 };
 
 // Admin Banners API
