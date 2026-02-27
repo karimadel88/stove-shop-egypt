@@ -292,4 +292,49 @@ export const bannersApi = {
   delete: (id: string) => api.delete(`/admin/banners/${id}`),
 };
 
+// Transfer Public API
+export const transferApi = {
+  getMethods: () => api.get('/transfer/methods'),
+  getQuote: (data: { fromMethodId: string; toMethodId: string; amount: number }) =>
+    api.post('/transfer/quote', data),
+  confirm: (data: {
+    fromMethodId: string;
+    toMethodId: string;
+    amount: number;
+    customerName?: string;
+    customerPhone?: string;
+    customerWhatsapp?: string;
+  }) => api.post('/transfer/confirm', data),
+  getOrders: (params: { phone: string; page?: number; limit?: number; status?: string }) =>
+    api.get('/transfer/orders', { params }),
+  getOrder: (id: string, phone: string) =>
+    api.get(`/transfer/orders/${id}`, { params: { phone } }),
+};
+
+// Transfer Admin API
+export const adminTransferApi = {
+  // Methods
+  listMethods: () => api.get('/admin/transfer/methods'),
+  getMethod: (id: string) => api.get(`/admin/transfer/methods/${id}`),
+  createMethod: (data: any) => api.post('/admin/transfer/methods', data),
+  updateMethod: (id: string, data: any) => api.patch(`/admin/transfer/methods/${id}`, data),
+  deleteMethod: (id: string) => api.delete(`/admin/transfer/methods/${id}`),
+
+  // Fee Rules
+  listFeeRules: () => api.get('/admin/transfer/fee-rules'),
+  getFeeRule: (id: string) => api.get(`/admin/transfer/fee-rules/${id}`),
+  createFeeRule: (data: any) => api.post('/admin/transfer/fee-rules', data),
+  updateFeeRule: (id: string, data: any) => api.patch(`/admin/transfer/fee-rules/${id}`, data),
+  deleteFeeRule: (id: string) => api.delete(`/admin/transfer/fee-rules/${id}`),
+
+  // Orders
+  listOrders: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+    api.get('/admin/transfer/orders', { params }),
+  getOrder: (id: string) => api.get(`/admin/transfer/orders/${id}`),
+  updateOrderStatus: (id: string, status: string) =>
+    api.patch(`/admin/transfer/orders/${id}/status`, { status }),
+  updateOrderNotes: (id: string, adminNotes: string) =>
+    api.patch(`/admin/transfer/orders/${id}/notes`, { adminNotes }),
+};
+
 export default api;

@@ -17,6 +17,9 @@ import {
   LogOut,
   Store,
   MessageSquare,
+  ArrowLeftRight,
+  Wallet,
+  Receipt,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -54,6 +57,9 @@ const menuItems: MenuItem[] = [
   { title: 'التقييمات', path: '/admin/reviews', icon: Star },
   { title: 'الإعدادات', path: '/admin/settings', icon: Settings },
   { title: 'المستخدمين', path: '/admin/users', icon: UserCog },
+  { title: 'طلبات التحويل', path: '/admin/transfers', icon: ArrowLeftRight },
+  { title: 'طرق التحويل', path: '/admin/transfer-methods', icon: Wallet },
+  { title: 'قواعد الرسوم', path: '/admin/fee-rules', icon: Receipt },
 ];
 
 // Isolated menu item component - only this re-renders on navigation

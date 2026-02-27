@@ -18,6 +18,8 @@ const Offers = lazy(() => import("./pages/Offers"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
+const TransferRequest = lazy(() => import("./pages/TransferRequest"));
+const TransferOrders = lazy(() => import("./pages/TransferOrders"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CustomerLayout = lazy(() => import("./components/CustomerLayout"));
 
@@ -38,6 +40,9 @@ const ContactMessages = lazy(() => import("./pages/admin/ContactMessages"));
 const Reviews = lazy(() => import("./pages/admin/Reviews"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 const Users = lazy(() => import("./pages/admin/Users"));
+const AdminTransferOrders = lazy(() => import("./pages/admin/TransferOrders"));
+const AdminTransferMethods = lazy(() => import("./pages/admin/TransferMethods"));
+const AdminFeeRules = lazy(() => import("./pages/admin/FeeRules"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,6 +90,8 @@ const App = () => (
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/transfer" element={<TransferRequest />} />
+                    <Route path="/transfer/orders" element={<TransferOrders />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
 
@@ -105,6 +112,9 @@ const App = () => (
                       <Route path="reviews" element={<Reviews />} />
                       <Route path="settings" element={<Settings />} />
                       <Route path="users" element={<Users />} />
+                      <Route path="transfers" element={<AdminTransferOrders />} />
+                      <Route path="transfer-methods" element={<AdminTransferMethods />} />
+                      <Route path="fee-rules" element={<AdminFeeRules />} />
                     </Route>
                   </Route>
 

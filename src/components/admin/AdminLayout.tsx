@@ -27,6 +27,9 @@ const pathTitles: Record<string, string> = {
   'reviews': 'التقييمات',
   'settings': 'الإعدادات',
   'users': 'المستخدمين',
+  'transfers': 'طلبات التحويل',
+  'transfer-methods': 'طرق التحويل',
+  'fee-rules': 'قواعد الرسوم',
 };
 
 // Isolated component for breadcrumb - only this re-renders on navigation
