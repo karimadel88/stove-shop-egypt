@@ -168,10 +168,10 @@ export default function Blogs() {
     }
   };
 
-  const filteredBlogs =
-    data?.blogs?.filter((blog: Blog) =>
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const blogsList = Array.isArray(data) ? data : (data?.blogs || []);
+  const filteredBlogs = blogsList.filter((blog: Blog) =>
+    blog.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 

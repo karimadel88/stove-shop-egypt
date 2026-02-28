@@ -151,10 +151,10 @@ export default function Faqs() {
     }
   };
 
-  const filteredFaqs =
-    data?.faqs?.filter((faq: FAQ) =>
-      faq.question.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const faqsList = Array.isArray(data) ? data : (data?.faqs || []);
+  const filteredFaqs = faqsList.filter((faq: FAQ) =>
+    faq.question.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 

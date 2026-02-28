@@ -167,10 +167,10 @@ export default function AdminOffers() {
     }
   };
 
-  const filteredOffers =
-    data?.offers?.filter((offer: Offer) =>
-      offer.title.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const offersList = Array.isArray(data) ? data : (data?.offers || []);
+  const filteredOffers = offersList.filter((offer: Offer) =>
+    offer.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 

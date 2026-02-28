@@ -66,10 +66,11 @@ export default function TransferCustomers() {
     toggleActiveMutation.mutate({ id, isActive: !currentStatus });
   };
 
-  const filteredCustomers = data?.customers?.filter((customer: TransferCustomer) =>
+  const customersList = Array.isArray(data) ? data : (data?.customers || []);
+  const filteredCustomers = customersList.filter((customer: TransferCustomer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.phone.includes(searchTerm)
-  ) || [];
+  );
 
   return (
     <div className="space-y-6">
