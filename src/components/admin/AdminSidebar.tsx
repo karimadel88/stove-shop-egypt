@@ -16,10 +16,13 @@ import {
   UserCog,
   LogOut,
   Store,
-  MessageSquare,
-  ArrowLeftRight,
   Wallet,
   Receipt,
+  MessageSquare,
+  ArrowLeftRight,
+  HelpCircle,
+  Newspaper,
+  Tags,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -60,6 +63,10 @@ const menuItems: MenuItem[] = [
   { title: 'طلبات التحويل', path: '/admin/transfers', icon: ArrowLeftRight },
   { title: 'طرق التحويل', path: '/admin/transfer-methods', icon: Wallet },
   { title: 'قواعد الرسوم', path: '/admin/fee-rules', icon: Receipt },
+  { title: 'عملاء التحويل', path: '/admin/transfer-customers', icon: Users },
+  { title: 'الأسئلة الشائعة', path: '/admin/faqs', icon: HelpCircle },
+  { title: 'المدونات', path: '/admin/blogs', icon: Newspaper },
+  { title: 'العروض', path: '/admin/offers', icon: Tags },
 ];
 
 // Isolated menu item component - only this re-renders on navigation

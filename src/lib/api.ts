@@ -292,6 +292,33 @@ export const bannersApi = {
   delete: (id: string) => api.delete(`/admin/banners/${id}`),
 };
 
+// FAQs API
+export const faqsApi = {
+  list: () => api.get('/admin/faqs'),
+  get: (id: string) => api.get(`/admin/faqs/${id}`),
+  create: (data: any) => api.post('/admin/faqs', data),
+  update: (id: string, data: any) => api.patch(`/admin/faqs/${id}`, data),
+  delete: (id: string) => api.delete(`/admin/faqs/${id}`),
+};
+
+// Blogs API
+export const blogsApi = {
+  list: () => api.get('/admin/blogs'),
+  get: (id: string) => api.get(`/admin/blogs/${id}`),
+  create: (data: any) => api.post('/admin/blogs', data),
+  update: (id: string, data: any) => api.patch(`/admin/blogs/${id}`, data),
+  delete: (id: string) => api.delete(`/admin/blogs/${id}`),
+};
+
+// Offers API
+export const adminOffersApi = {
+  list: () => api.get('/admin/offers'),
+  get: (id: string) => api.get(`/admin/offers/${id}`),
+  create: (data: any) => api.post('/admin/offers', data),
+  update: (id: string, data: any) => api.patch(`/admin/offers/${id}`, data),
+  delete: (id: string) => api.delete(`/admin/offers/${id}`),
+};
+
 // Transfer Public API
 export const transferApi = {
   getMethods: () => api.get('/transfer/methods'),
@@ -335,6 +362,12 @@ export const adminTransferApi = {
     api.patch(`/admin/transfer/orders/${id}/status`, { status }),
   updateOrderNotes: (id: string, adminNotes: string) =>
     api.patch(`/admin/transfer/orders/${id}/notes`, { adminNotes }),
+
+  // Customers
+  listCustomers: () => api.get('/admin/transfer/customers'),
+  getCustomer: (id: string) => api.get(`/admin/transfer/customers/${id}`),
+  toggleCustomerActive: (id: string, isActive: boolean) =>
+    api.patch(`/admin/transfer/customers/${id}/toggle-active`, { isActive }),
 };
 
 export default api;

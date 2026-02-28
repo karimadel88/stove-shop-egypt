@@ -43,6 +43,10 @@ const Users = lazy(() => import("./pages/admin/Users"));
 const AdminTransferOrders = lazy(() => import("./pages/admin/TransferOrders"));
 const AdminTransferMethods = lazy(() => import("./pages/admin/TransferMethods"));
 const AdminFeeRules = lazy(() => import("./pages/admin/FeeRules"));
+const AdminTransferCustomers = lazy(() => import("./pages/admin/TransferCustomers"));
+const AdminFaqs = lazy(() => import("./pages/admin/Faqs"));
+const AdminBlogs = lazy(() => import("./pages/admin/Blogs"));
+const AdminOffers = lazy(() => import("./pages/admin/AdminOffers"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -115,6 +119,10 @@ const App = () => (
                       <Route path="transfers" element={<AdminTransferOrders />} />
                       <Route path="transfer-methods" element={<AdminTransferMethods />} />
                       <Route path="fee-rules" element={<AdminFeeRules />} />
+                      <Route path="transfer-customers" element={<AdminTransferCustomers />} />
+                      <Route path="faqs" element={<AdminFaqs />} />
+                      <Route path="blogs" element={<AdminBlogs />} />
+                      <Route path="offers" element={<AdminOffers />} />
                     </Route>
                   </Route>
 

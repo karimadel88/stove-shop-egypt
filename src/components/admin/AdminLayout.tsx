@@ -30,6 +30,10 @@ const pathTitles: Record<string, string> = {
   'transfers': 'طلبات التحويل',
   'transfer-methods': 'طرق التحويل',
   'fee-rules': 'قواعد الرسوم',
+  'transfer-customers': 'عملاء التحويل',
+  'faqs': 'الأسئلة الشائعة',
+  'blogs': 'المدونات',
+  'offers': 'العروض',
 };
 
 // Isolated component for breadcrumb - only this re-renders on navigation
