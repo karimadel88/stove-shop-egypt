@@ -293,6 +293,12 @@ export interface DashboardStats {
   totalProducts: number;
   pendingOrders: number;
   lowStockProducts: number;
+  totalVisits?: number;
+}
+
+export interface VisitStats {
+  total: number;
+  last30Days: { date: string; count: number }[];
 }
 
 export interface TopProduct {

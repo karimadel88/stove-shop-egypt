@@ -237,6 +237,7 @@ export const dashboardApi = {
     api.get('/admin/dashboard/recent-orders', { params: { limit } }),
   topProducts: (limit?: number) =>
     api.get('/admin/dashboard/top-products', { params: { limit } }),
+  visitStats: () => api.get('/admin/visits/stats'),
 };
 
 // Shop Public API

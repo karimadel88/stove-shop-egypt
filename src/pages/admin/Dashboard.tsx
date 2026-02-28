@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { dashboardApi } from '@/lib/api';
-import { DashboardStats, Order } from '@/types/admin';
+import { DashboardStats, Order, VisitStats } from '@/types/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,24 +22,12 @@ import {
   Clock,
   AlertTriangle,
   ArrowLeft,
-  TrendingUp,
   Activity,
   CreditCard,
-  Target
+  Eye,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-// Mock data for the chart (since API doesn't provide history yet)
-const mockRevenueData = [
-  { name: 'يناير', total: 4500 },
-  { name: 'فبراير', total: 5200 },
-  { name: 'مارس', total: 4800 },
-  { name: 'أبريل', total: 6100 },
-  { name: 'مايو', total: 5500 },
-  { name: 'يونيو', total: 7500 },
-  { name: 'يوليو', total: 7200 },
-];
 
 const statusLabels: Record<string, string> = {
   pending: 'قيد الانتظار',
@@ -59,8 +47,15 @@ const statusColors: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700 hover:bg-red-100/80',
 };
 
+/** Format a YYYY-MM-DD date string into a short Arabic-friendly label */
+function formatDayLabel(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  return d.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,15 +64,17 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, ordersRes, productsRes] = await Promise.all([
+        const [statsRes, ordersRes, productsRes, visitsRes] = await Promise.all([
           dashboardApi.stats(),
           dashboardApi.recentOrders(5),
           dashboardApi.topProducts(5),
+          dashboardApi.visitStats(),
         ]);
-        
+
         setStats(statsRes.data);
         setRecentOrders(ordersRes.data || []);
         setTopProducts(productsRes.data || []);
+        setVisitStats(visitsRes.data);
       } catch (err: any) {
         setError(err.response?.data?.message || 'فشل في تحميل بيانات لوحة التحكم');
       } finally {
@@ -106,7 +103,7 @@ export default function Dashboard() {
       color: 'text-green-600',
       bg: 'bg-green-100',
       format: (v: number) => `${v.toLocaleString('ar-EG')} ج.م`,
-      desc: '+20.1% من الشهر الماضي'
+      desc: 'إجمالي الإيرادات المحققة'
     },
     {
       title: 'إجمالي الطلبات',
@@ -114,7 +111,7 @@ export default function Dashboard() {
       icon: ShoppingCart,
       color: 'text-blue-600',
       bg: 'bg-blue-100',
-      desc: '+180 طلب جديد'
+      desc: 'جميع الطلبات المسجلة'
     },
     {
       title: 'العملاء النشطين',
@@ -122,17 +119,23 @@ export default function Dashboard() {
       icon: Users,
       color: 'text-purple-600',
       bg: 'bg-purple-100',
-      desc: '+19 عميل جديد'
+      desc: 'إجمالي العملاء المسجلين'
     },
     {
-      title: 'إجمالي المنتجات',
-      value: stats?.totalProducts ?? 0,
-      icon: Package,
-      color: 'text-orange-600',
-      bg: 'bg-orange-100',
-      desc: '12 منتج نفد مخزونها'
-    }
+      title: 'إجمالي الزيارات',
+      value: visitStats?.total ?? 0,
+      icon: Eye,
+      color: 'text-teal-600',
+      bg: 'bg-teal-100',
+      desc: 'جميع الزيارات منذ الإطلاق'
+    },
   ];
+
+  // Build chart data from the real last-30-days visits
+  const chartData = visitStats?.last30Days.map((d) => ({
+    name: formatDayLabel(d.date),
+    زيارات: d.count,
+  })) ?? [];
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
@@ -145,10 +148,6 @@ export default function Dashboard() {
           <Button variant="outline" className="gap-2 text-sm">
             <Clock className="w-4 h-4" />
             <span className="hidden sm:inline">آخر 30 يوم</span>
-          </Button>
-          <Button className="gap-2 text-sm">
-            <Target className="w-4 h-4" />
-            <span className="hidden sm:inline">تقرير مفصل</span>
           </Button>
         </div>
       </div>
@@ -184,53 +183,64 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-        {/* Chart Section */}
+        {/* Visits Chart */}
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>نظرة عامة على الإيرادات</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-teal-600" />
+              الزيارات اليومية (آخر 30 يوم)
+            </CardTitle>
             <CardDescription>
-              عرض الإيرادات الشهرية للسنة الحالية
+              عدد زيارات الموقع لكل يوم خلال الشهر الماضي
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <div className="h-[350px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockRevenueData}>
-                  <defs>
-                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `${value}`}
-                  />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorTotal)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            {isLoading ? (
+              <Skeleton className="h-[350px] w-full" />
+            ) : (
+              <div className="h-[350px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0d9488" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      interval={4}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      formatter={(value: number) => [`${value} زيارة`, 'الزيارات']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="زيارات"
+                      stroke="#0d9488"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorVisits)"
+                      dot={false}
+                      activeDot={{ r: 4, fill: '#0d9488' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -259,18 +269,17 @@ export default function Dashboard() {
                 {topProducts
                   .filter(p => (p.totalSold || 0) > 0)
                   .map((product, index, filteredArray) => {
-                  // Calculate percentage relative to top product (or arbitrary max)
                   const maxSold = Math.max(...filteredArray.map(p => p.totalSold || 0), 1);
                   const sales = product.totalSold || 0;
                   const percentage = (sales / maxSold) * 100;
-                  
+
                   return (
                     <div key={product.productId || product._id || index} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ring-2 ring-white shadow-sm
-                            ${index === 0 ? 'bg-yellow-100 text-yellow-700' : 
-                              index === 1 ? 'bg-slate-100 text-slate-700' : 
+                            ${index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                              index === 1 ? 'bg-slate-100 text-slate-700' :
                               index === 2 ? 'bg-orange-100 text-orange-800' : 'bg-muted text-muted-foreground'
                             }`}>
                             {index + 1}
@@ -388,7 +397,7 @@ export default function Dashboard() {
               </div>
            </CardContent>
          </Card>
-         
+
          <Card className="bg-blue-50 border-blue-100">
            <CardContent className="p-6 flex items-center justify-between">
               <div>
@@ -407,8 +416,8 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-purple-800">متوسط قيمة الطلب</p>
                 <p className="text-2xl font-bold text-purple-900 mt-1">
-                   {stats && stats.totalOrders > 0 
-                     ? Math.round(stats.totalRevenue / stats.totalOrders).toLocaleString() 
+                   {stats && stats.totalOrders > 0
+                     ? Math.round(stats.totalRevenue / stats.totalOrders).toLocaleString()
                      : 0} ج.م
                 </p>
                 <p className="text-xs text-purple-600 mt-1">لكل عملية بيع ناجحة</p>
@@ -419,15 +428,17 @@ export default function Dashboard() {
            </CardContent>
          </Card>
 
-         <Card className="bg-green-50 border-green-100">
+         <Card className="bg-teal-50 border-teal-100">
            <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-800">معدل التحويل</p>
-                <p className="text-2xl font-bold text-green-900 mt-1">2.4%</p>
-                <p className="text-xs text-green-600 mt-1">زيادة بنسبة 0.4%</p>
+                <p className="text-sm font-medium text-teal-800">زيارات اليوم</p>
+                <p className="text-2xl font-bold text-teal-900 mt-1">
+                  {visitStats?.last30Days.at(-1)?.count ?? 0}
+                </p>
+                <p className="text-xs text-teal-600 mt-1">زيارة حتى الآن اليوم</p>
               </div>
               <div className="p-3 bg-white rounded-full">
-                <Activity className="h-6 w-6 text-green-600" />
+                <Activity className="h-6 w-6 text-teal-600" />
               </div>
            </CardContent>
          </Card>
