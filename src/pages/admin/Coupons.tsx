@@ -164,15 +164,15 @@ export default function Coupons() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Ticket className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Ticket className="h-7 w-7 sm:h-8 sm:w-8" />
             الكوبونات
           </h1>
-          <p className="text-muted-foreground">إدارة كوبونات الخصم</p>
+          <p className="text-muted-foreground text-sm">إدارة كوبونات الخصم</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة كوبون جديد
         </Button>
@@ -195,6 +195,7 @@ export default function Coupons() {
               <p>لا توجد كوبونات</p>
             </div>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -290,13 +291,14 @@ export default function Coupons() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] sm:w-auto max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingCoupon ? 'تعديل الكوبون' : 'إضافة كوبون جديد'}</DialogTitle>
             <DialogDescription>
@@ -327,7 +329,7 @@ export default function Coupons() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>النوع</Label>
                   <Select value={formData.type} onValueChange={(v: any) => setFormData({ ...formData, type: v })}>
@@ -353,7 +355,7 @@ export default function Coupons() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="minOrderAmount">الحد الأدنى للطلب (ج.م)</Label>
                   <Input
@@ -376,7 +378,7 @@ export default function Coupons() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="validFrom">صالح من</Label>
                   <Input

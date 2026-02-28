@@ -160,15 +160,15 @@ export default function Faqs() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2 tracking-tight">
-            <HelpCircle className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 tracking-tight">
+            <HelpCircle className="h-7 w-7 sm:h-8 sm:w-8" />
             الأسئلة الشائعة
           </h1>
-          <p className="text-muted-foreground">إدارة الأسئلة الشائعة المعروضة في الموقع</p>
+          <p className="text-muted-foreground text-sm">إدارة الأسئلة الشائعة المعروضة في الموقع</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة سؤال جديد
         </Button>
@@ -195,7 +195,7 @@ export default function Faqs() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -253,7 +253,7 @@ export default function Faqs() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] sm:w-auto max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingFaq ? "تعديل السؤال" : "إضافة سؤال جديد"}</DialogTitle>
             <DialogDescription>

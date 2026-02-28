@@ -163,15 +163,15 @@ export default function Banners() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Images className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Images className="h-7 w-7 sm:h-8 sm:w-8" />
             اللافتات الإعلانية
           </h1>
-          <p className="text-muted-foreground">إدارة صور السلايدر في الصفحة الرئيسية</p>
+          <p className="text-muted-foreground text-sm">إدارة صور السلايدر في الصفحة الرئيسية</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة لافتة جديدة
         </Button>
@@ -194,6 +194,7 @@ export default function Banners() {
               <p>لم يتم العثور على لافتات</p>
             </div>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -261,13 +262,14 @@ export default function Banners() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Create/Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>{editingBanner ? 'تعديل اللافتة' : 'إضافة لافتة جديدة'}</DialogTitle>
             <DialogDescription>
@@ -300,7 +302,7 @@ export default function Banners() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">العنوان الرئيسي</Label>
                   <Input
@@ -321,7 +323,7 @@ export default function Banners() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-2">
                   <Label htmlFor="link">رابط التوجيه</Label>
                   <Input

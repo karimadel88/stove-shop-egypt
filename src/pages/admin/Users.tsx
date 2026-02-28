@@ -100,12 +100,12 @@ export default function Users() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2"><UserCog className="h-8 w-8" />المستخدمين</h1>
-          <p className="text-muted-foreground">إدارة مستخدمي لوحة التحكم</p>
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2"><UserCog className="h-7 w-7 sm:h-8 sm:w-8" />المستخدمين</h1>
+          <p className="text-muted-foreground text-sm">إدارة مستخدمي لوحة التحكم</p>
         </div>
-        <Button onClick={openCreate} className="shadow-sm">
+        <Button onClick={openCreate} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة مستخدم جديد
         </Button>
@@ -119,6 +119,7 @@ export default function Users() {
           ) : users.length === 0 ? (
             <p className="text-center py-12 text-muted-foreground">لا يوجد مستخدمين</p>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -178,19 +179,20 @@ export default function Users() {
                 })}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] sm:w-auto max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingUser ? 'تعديل المستخدم' : 'إضافة مستخدم'}</DialogTitle>
             <DialogDescription>إدارة بيانات المستخدم</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>الاسم الأول *</Label>
                   <Input value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} required />

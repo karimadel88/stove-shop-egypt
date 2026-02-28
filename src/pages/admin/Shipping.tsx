@@ -172,15 +172,15 @@ export default function Shipping() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Truck className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Truck className="h-7 w-7 sm:h-8 sm:w-8" />
             طرق الشحن
           </h1>
-          <p className="text-muted-foreground">إعداد خيارات التوصيل والأسعار</p>
+          <p className="text-muted-foreground text-sm">إعداد خيارات التوصيل والأسعار</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة طريقة شحن جديدة
         </Button>
@@ -203,6 +203,7 @@ export default function Shipping() {
               <p>لا توجد طرق شحن</p>
             </div>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -274,13 +275,14 @@ export default function Shipping() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] sm:w-auto max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingMethod ? 'تعديل طريقة الشحن' : 'إضافة طريقة شحن جديدة'}</DialogTitle>
             <DialogDescription>إعداد خيار الشحن</DialogDescription>
@@ -305,7 +307,7 @@ export default function Shipping() {
                   rows={2}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="basePrice">السعر الأساسي (ج.م) *</Label>
                   <Input
@@ -351,7 +353,7 @@ export default function Shipping() {
 
       {/* City Pricing Dialog */}
       <Dialog open={isPricingOpen} onOpenChange={setIsPricingOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>أسعار المدن - {pricingMethod?.name}</DialogTitle>
             <DialogDescription>

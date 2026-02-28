@@ -69,12 +69,12 @@ function AdminLayoutComponent() {
     <SidebarProvider>
       <MemoizedSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-3 sm:px-4">
           <SidebarTrigger className="-mr-1" />
           <Separator orientation="vertical" className="mx-2 h-4" />
           <BreadcrumbNav />
         </header>
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-3 sm:p-6">
           <Outlet />
         </main>
       </SidebarInset>

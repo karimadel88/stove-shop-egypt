@@ -86,8 +86,8 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2"><SettingsIcon className="h-8 w-8" />الإعدادات</h1>
-        <p className="text-muted-foreground">إعداد خيارات المتجر</p>
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2"><SettingsIcon className="h-7 w-7 sm:h-8 sm:w-8" />الإعدادات</h1>
+        <p className="text-muted-foreground text-sm">إعداد خيارات المتجر</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -165,7 +165,7 @@ export default function Settings() {
 
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5" />الضريبة</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>اسم الضريبة</Label>
               <Input value={settings.taxName} onChange={(e) => setSettings({ ...settings, taxName: e.target.value })} />
@@ -180,7 +180,7 @@ export default function Settings() {
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5" />التواصل</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>البريد الإلكتروني</Label>
                 <Input value={settings.contactInfo?.email || ''} onChange={(e) => setSettings({ ...settings, contactInfo: { ...settings.contactInfo, email: e.target.value } })} dir="ltr" />
@@ -212,7 +212,7 @@ export default function Settings() {
 
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5" />التواصل الاجتماعي</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>فيسبوك</Label>
               <Input value={settings.socialLinks?.facebook || ''} onChange={(e) => setSettings({ ...settings, socialLinks: { ...settings.socialLinks, facebook: e.target.value } })} dir="ltr" />

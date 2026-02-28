@@ -176,15 +176,15 @@ export default function AdminOffers() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2 tracking-tight">
-            <Tags className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 tracking-tight">
+            <Tags className="h-7 w-7 sm:h-8 sm:w-8" />
             العروض
           </h1>
-          <p className="text-muted-foreground">إدارة العروض الترويجية والخصومات المعروضة في الموقع</p>
+          <p className="text-muted-foreground text-sm">إدارة العروض الترويجية والخصومات المعروضة في الموقع</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة عرض جديد
         </Button>
@@ -211,7 +211,7 @@ export default function AdminOffers() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -284,7 +284,7 @@ export default function AdminOffers() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>{editingOffer ? "تعديل العرض" : "إضافة عرض جديد"}</DialogTitle>
             <DialogDescription>
@@ -324,7 +324,7 @@ export default function AdminOffers() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="sortOrder">ترتيب العرض</Label>
                   <Input

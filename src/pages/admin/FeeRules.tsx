@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -21,15 +22,16 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Receipt, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Receipt, Loader2, Gift } from 'lucide-react';
 
 interface FeeRuleFormData {
   fromMethodId: string;
   toMethodId: string;
   feeType: 'PERCENT' | 'FIXED';
   feeValue: number;
-  minFee: number;
-  maxFee: number;
+  benefitType: 'FEE' | 'CASHBACK';
+  minAmount: number;
+  maxAmount: number;
   enabled: boolean;
   priority: number;
 }
@@ -39,8 +41,9 @@ const defaultFormData: FeeRuleFormData = {
   toMethodId: '',
   feeType: 'PERCENT',
   feeValue: 0,
-  minFee: 0,
-  maxFee: 0,
+  benefitType: 'FEE',
+  minAmount: 0,
+  maxAmount: 0,
   enabled: true,
   priority: 10,
 };
@@ -99,8 +102,9 @@ export default function AdminFeeRules() {
       toMethodId: getMethodId(rule.toMethodId),
       feeType: rule.feeType,
       feeValue: rule.feeValue,
-      minFee: rule.minFee || 0,
-      maxFee: rule.maxFee || 0,
+      benefitType: rule.benefitType || 'FEE',
+      minAmount: rule.minAmount || 0,
+      maxAmount: rule.maxAmount || 0,
       enabled: rule.enabled,
       priority: rule.priority,
     });
@@ -116,8 +120,9 @@ export default function AdminFeeRules() {
     setIsSubmitting(true);
     try {
       const payload: any = { ...formData };
-      if (!payload.minFee) delete payload.minFee;
-      if (!payload.maxFee) delete payload.maxFee;
+      // Only send minAmount/maxAmount if they have a non-zero value
+      if (!payload.minAmount) delete payload.minAmount;
+      if (!payload.maxAmount) delete payload.maxAmount;
 
       if (editingRule) {
         await adminTransferApi.updateFeeRule(editingRule._id, payload);
@@ -196,8 +201,9 @@ export default function AdminFeeRules() {
                     <TableHead className="text-right">إلى</TableHead>
                     <TableHead className="text-right">النوع</TableHead>
                     <TableHead className="text-right">القيمة</TableHead>
-                    <TableHead className="text-right">الحد الأدنى</TableHead>
-                    <TableHead className="text-right">الحد الأقصى</TableHead>
+                    <TableHead className="text-right">النفع</TableHead>
+                    <TableHead className="text-right">الحد الأدنى للمبلغ</TableHead>
+                    <TableHead className="text-right">الحد الأقصى للمبلغ</TableHead>
                     <TableHead className="text-center">الأولوية</TableHead>
                     <TableHead className="text-center">الحالة</TableHead>
                     <TableHead className="text-left">الإجراءات</TableHead>
@@ -214,8 +220,18 @@ export default function AdminFeeRules() {
                           ? `${rule.feeValue}%`
                           : `${rule.feeValue.toLocaleString('ar-EG')} ج.م`}
                       </TableCell>
-                      <TableCell>{rule.minFee ? `${rule.minFee.toLocaleString('ar-EG')} ج.م` : '-'}</TableCell>
-                      <TableCell>{rule.maxFee ? `${rule.maxFee.toLocaleString('ar-EG')} ج.م` : '-'}</TableCell>
+                      <TableCell>
+                        {rule.benefitType === 'CASHBACK' ? (
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-700 flex items-center gap-1 w-fit">
+                            <Gift className="h-3 w-3" />
+                            كاش باك
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">رسوم</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{rule.minAmount ? `${rule.minAmount.toLocaleString('ar-EG')} ج.م` : '-'}</TableCell>
+                      <TableCell>{rule.maxAmount ? `${rule.maxAmount.toLocaleString('ar-EG')} ج.م` : '-'}</TableCell>
                       <TableCell className="text-center">{rule.priority}</TableCell>
                       <TableCell className="text-center">
                         <Switch checked={rule.enabled} onCheckedChange={() => handleToggleEnabled(rule)} />
@@ -244,7 +260,7 @@ export default function AdminFeeRules() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingRule ? 'تعديل قاعدة الرسوم' : 'إضافة قاعدة رسوم جديدة'}</DialogTitle>
-            <DialogDescription>تحديد رسوم التحويل</DialogDescription>
+            <DialogDescription>تحديد رسوم أو كاش باك التحويل</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
@@ -270,9 +286,11 @@ export default function AdminFeeRules() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Fee Type + Benefit Type */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>نوع الرسوم</Label>
+                  <Label>نوع الحساب</Label>
                   <Select value={formData.feeType} onValueChange={(val: 'PERCENT' | 'FIXED') => setFormData({ ...formData, feeType: val })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -282,20 +300,58 @@ export default function AdminFeeRules() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="feeValue">القيمة *</Label>
-                  <Input id="feeValue" type="number" min="0" step="any" value={formData.feeValue} onChange={(e) => setFormData({ ...formData, feeValue: parseFloat(e.target.value) || 0 })} required />
+                  <Label>النفع للعميل</Label>
+                  <Select value={formData.benefitType} onValueChange={(val: 'FEE' | 'CASHBACK') => setFormData({ ...formData, benefitType: val })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FEE">رسوم (يدفع العميل)</SelectItem>
+                      <SelectItem value="CASHBACK">كاش باك (يحصل العميل)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="feeValue">
+                  {formData.benefitType === 'CASHBACK' ? 'قيمة الكاش باك *' : 'قيمة الرسوم *'}
+                </Label>
+                <Input
+                  id="feeValue"
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={formData.feeValue}
+                  onChange={(e) => setFormData({ ...formData, feeValue: parseFloat(e.target.value) || 0 })}
+                  required
+                />
+              </div>
+
+              {/* Min/Max transfer AMOUNT */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="minFee">الحد الأدنى (ج.م)</Label>
-                  <Input id="minFee" type="number" min="0" value={formData.minFee} onChange={(e) => setFormData({ ...formData, minFee: parseFloat(e.target.value) || 0 })} />
+                  <Label htmlFor="minAmount">الحد الأدنى للتحويل (ج.م)</Label>
+                  <Input
+                    id="minAmount"
+                    type="number"
+                    min="0"
+                    placeholder="بدون حد"
+                    value={formData.minAmount || ''}
+                    onChange={(e) => setFormData({ ...formData, minAmount: parseFloat(e.target.value) || 0 })}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="maxFee">الحد الأقصى (ج.م)</Label>
-                  <Input id="maxFee" type="number" min="0" value={formData.maxFee} onChange={(e) => setFormData({ ...formData, maxFee: parseFloat(e.target.value) || 0 })} />
+                  <Label htmlFor="maxAmount">الحد الأقصى للتحويل (ج.م)</Label>
+                  <Input
+                    id="maxAmount"
+                    type="number"
+                    min="0"
+                    placeholder="بدون حد"
+                    value={formData.maxAmount || ''}
+                    onChange={(e) => setFormData({ ...formData, maxAmount: parseFloat(e.target.value) || 0 })}
+                  />
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="priority">الأولوية</Label>
                 <Input id="priority" type="number" min="0" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })} />

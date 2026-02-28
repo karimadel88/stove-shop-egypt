@@ -219,15 +219,15 @@ export default function Products() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Package className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Package className="h-7 w-7 sm:h-8 sm:w-8" />
             المنتجات
           </h1>
-          <p className="text-muted-foreground">إدارة منتجات المتجر</p>
+          <p className="text-muted-foreground text-sm">إدارة منتجات المتجر</p>
         </div>
-        <Button onClick={openCreateDialog} className="shadow-sm">
+        <Button onClick={openCreateDialog} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة منتج جديد
         </Button>
@@ -267,6 +267,7 @@ export default function Products() {
             </div>
           ) : (
             <>
+              <div className="overflow-x-auto -mx-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -364,6 +365,7 @@ export default function Products() {
                   })}
                 </TableBody>
               </Table>
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
@@ -400,7 +402,7 @@ export default function Products() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>{editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}</DialogTitle>
             <DialogDescription>
@@ -419,7 +421,7 @@ export default function Products() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">اسم المنتج *</Label>
                   <Input
@@ -441,7 +443,7 @@ export default function Products() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="sku">SKU *</Label>
                   <Input
@@ -473,7 +475,7 @@ export default function Products() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">السعر (ج.م) *</Label>
                   <Input
@@ -499,7 +501,7 @@ export default function Products() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="quantity">الكمية *</Label>
                   <Input

@@ -110,11 +110,11 @@ export default function ContactMessages() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <MessageSquare className="h-8 w-8" />
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+          <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8" />
           رسائل التواصل
         </h1>
-        <p className="text-muted-foreground">عرض رسائل نموذج التواصـل</p>
+        <p className="text-muted-foreground text-sm">عرض رسائل نموذج التواصـل</p>
       </div>
 
       <Card>
@@ -134,6 +134,7 @@ export default function ContactMessages() {
               <p>لا توجد رسائل جديدة</p>
             </div>
           ) : (
+            <div className="overflow-x-auto rounded-md border">
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -209,12 +210,13 @@ export default function ContactMessages() {
                 </TableBody>
               </Table>
             </div>
+            </div>
           )}
         </CardContent>
       </Card>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل الرسالة</DialogTitle>
             <DialogDescription>

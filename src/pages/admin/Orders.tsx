@@ -171,13 +171,13 @@ export default function Orders() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <ShoppingCart className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <ShoppingCart className="h-7 w-7 sm:h-8 sm:w-8" />
             الطلبات
           </h1>
-          <p className="text-muted-foreground">إدارة طلبات العملاء</p>
+          <p className="text-muted-foreground text-sm">إدارة طلبات العملاء</p>
         </div>
       </div>
 
@@ -223,6 +223,7 @@ export default function Orders() {
             </div>
           ) : (
             <>
+              <div className="overflow-x-auto -mx-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -281,6 +282,7 @@ export default function Orders() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
@@ -317,7 +319,7 @@ export default function Orders() {
 
       {/* Order Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-auto">
           <DialogHeader>
             <DialogTitle>طلب رقم {selectedOrder?.orderNumber}</DialogTitle>
             <DialogDescription>
@@ -328,7 +330,7 @@ export default function Orders() {
           {selectedOrder && (
             <div className="space-y-6">
               {/* Status Updates */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>حالة الطلب</Label>
                   <Select
@@ -396,7 +398,7 @@ export default function Orders() {
               <Separator />
 
               {/* Customer Info */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-medium mb-2">العميل</h4>
                   <div className="text-sm space-y-1">

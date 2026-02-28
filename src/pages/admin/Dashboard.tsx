@@ -135,26 +135,26 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">نظرة عامة</h1>
-          <p className="text-muted-foreground mt-1">مرحباً بك مرة أخرى، إليك ما يحدث في متجرك اليوم.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">نظرة عامة</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">مرحباً بك مرة أخرى، إليك ما يحدث في متجرك اليوم.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 text-sm">
             <Clock className="w-4 h-4" />
-            آخر 30 يوم
+            <span className="hidden sm:inline">آخر 30 يوم</span>
           </Button>
-          <Button className="gap-2">
+          <Button className="gap-2 text-sm">
             <Target className="w-4 h-4" />
-            تقرير مفصل
+            <span className="hidden sm:inline">تقرير مفصل</span>
           </Button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         {statCards.map((card, i) => (
           <Card key={i} className="hover:shadow-lg transition-all duration-300 border-none shadow-soft group">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -183,9 +183,9 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
         {/* Chart Section */}
-        <Card className="col-span-4">
+        <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>نظرة عامة على الإيرادات</CardTitle>
             <CardDescription>
@@ -235,7 +235,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Top Products */}
-        <Card className="col-span-3">
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>أفضل المنتجات مبيعاً</CardTitle>
             <CardDescription>
@@ -296,10 +296,10 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4">
         {/* Recent Orders */}
-        <Card className="col-span-7">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle>الطلبات الحديثة</CardTitle>
               <CardDescription>
@@ -325,6 +325,7 @@ export default function Dashboard() {
                 لا توجد طلبات بعد
               </div>
             ) : (
+              <div className="overflow-x-auto -mx-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -367,13 +368,14 @@ export default function Dashboard() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
        {/* Alerts & Quick Stats */}
-       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
          <Card className="bg-orange-50 border-orange-100">
            <CardContent className="p-6 flex items-center justify-between">
               <div>

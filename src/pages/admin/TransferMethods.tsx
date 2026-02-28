@@ -135,15 +135,15 @@ export default function AdminTransferMethods() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Wallet className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Wallet className="h-7 w-7 sm:h-8 sm:w-8" />
             طرق التحويل
           </h1>
-          <p className="text-muted-foreground">إدارة طرق التحويل المتاحة</p>
+          <p className="text-muted-foreground text-sm">إدارة طرق التحويل المتاحة</p>
         </div>
-        <Button onClick={openCreate} className="shadow-sm">
+        <Button onClick={openCreate} className="shadow-sm w-full sm:w-auto">
           <Plus className="ml-2 h-4 w-4" />
           إضافة طريقة جديدة
         </Button>
@@ -164,6 +164,7 @@ export default function AdminTransferMethods() {
               <p>لا توجد طرق تحويل</p>
             </div>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -202,13 +203,14 @@ export default function AdminTransferMethods() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] sm:w-auto max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingMethod ? 'تعديل طريقة التحويل' : 'إضافة طريقة تحويل جديدة'}</DialogTitle>
             <DialogDescription>إعداد طريقة التحويل</DialogDescription>

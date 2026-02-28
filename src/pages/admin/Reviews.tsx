@@ -110,11 +110,11 @@ export default function Reviews() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Star className="h-8 w-8" />
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+          <Star className="h-7 w-7 sm:h-8 sm:w-8" />
           التقييمات
         </h1>
-        <p className="text-muted-foreground">إدارة تقييمات العملاء</p>
+        <p className="text-muted-foreground text-sm">إدارة تقييمات العملاء</p>
       </div>
 
       {/* Pending Reviews */}
@@ -135,6 +135,7 @@ export default function Reviews() {
           ) : pendingReviews.length === 0 ? (
             <p className="text-center py-8 text-muted-foreground">لا توجد تقييمات معلقة</p>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -206,6 +207,7 @@ export default function Reviews() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -223,6 +225,7 @@ export default function Reviews() {
           ) : approvedReviews.length === 0 ? (
             <p className="text-center py-8 text-muted-foreground">لا توجد تقييمات مقبولة</p>
           ) : (
+            <div className="overflow-x-auto -mx-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -274,6 +277,7 @@ export default function Reviews() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

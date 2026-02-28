@@ -74,13 +74,11 @@ export default function TransferCustomers() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">عملاء التحويل</h1>
-          <p className="text-muted-foreground">
-            إدارة عملاء خدمة تحويل الأموال
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">عملاء التحويل</h1>
+        <p className="text-muted-foreground text-sm">
+          إدارة عملاء خدمة تحويل الأموال
+        </p>
       </div>
 
       <Card>
@@ -103,7 +101,7 @@ export default function TransferCustomers() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
